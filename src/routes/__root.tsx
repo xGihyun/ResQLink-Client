@@ -1,18 +1,24 @@
-import { Outlet, createRootRoute } from "@tanstack/react-router";
+import { Outlet, createRootRoute, createRootRouteWithContext } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import "../styles.css";
 import { useEffect } from "react";
 import { LocalNotifications } from "@capacitor/local-notifications";
-import { Button } from "@/components/ui/button";
 import supabase from "@/lib/supabase";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { Capacitor } from "@capacitor/core";
 import { Geolocation } from "@capacitor/geolocation";
 import { useAuthStore } from "@/store/store.auth";
+import { QueryClient } from "@tanstack/react-query";
+import { AuthContextValue } from "@/lib/auth";
 
-export const Route = createRootRoute({
-	component: RootComponent,
+type RouterContext = {
+	auth: AuthContextValue;
+	queryClient: QueryClient;
+};
+
+export const Route = createRootRouteWithContext<RouterContext>()({
+	component: RootComponent
 });
 
 function RootComponent() {

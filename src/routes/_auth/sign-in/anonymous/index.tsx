@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from 'sonner';
 
-export const Route = createFileRoute('/sign-in/anonymous/')({
+export const Route = createFileRoute('/_auth/sign-in/anonymous/')({
   component: RouteComponent,
 })
 

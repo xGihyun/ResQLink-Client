@@ -27,7 +27,7 @@ import { IllustrationResponder, IllustrationCitizen } from "@/assets/icons";
 import { signUpSchema, SignUpSchema } from "./fillup-form/-schema";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/sign-up/")({
+export const Route = createFileRoute("/_auth/sign-up/")({
 	component: RouteComponent,
 });
 

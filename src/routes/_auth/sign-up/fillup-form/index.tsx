@@ -22,7 +22,7 @@ import { PasswordIcon } from "@/assets/icons/";
 import { IllustrationResponder } from "@/assets/icons/";
 import { IllustrationCitizen } from "@/assets/icons/";
 
-export const Route = createFileRoute("/sign-up/fillup-form/")({
+export const Route = createFileRoute("/_auth/sign-up/fillup-form/")({
   component: RouteComponent,
 });
 

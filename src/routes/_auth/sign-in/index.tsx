@@ -21,7 +21,7 @@ import { useAuthStore } from "@/store/store.auth";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/sign-in/")({
+export const Route = createFileRoute("/_auth/sign-in/")({
   component: RouteComponent,
 });
 

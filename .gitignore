@@ -20,4 +20,4 @@ dist/
 
 # Env
 .env
-routeTree.gen.ts
+src/routeTree.gen.ts
