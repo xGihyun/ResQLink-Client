@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/coordination-list/")({
+export const Route = createFileRoute("/_authed/coordination-list/")({
   component: RouteComponent,
 });
 

@@ -9,16 +9,17 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { useAuthStore } from "@/store/store.auth";
 import { Navbar } from "@/routes/-components/navbar";
+import { JSX } from "react";
+import { useAuth } from "@/auth";
 
-export const Route = createFileRoute("/main/preferences/")({
+export const Route = createFileRoute("/_authed/preferences/")({
 	component: RouteComponent,
 });
 
-function RouteComponent() {
+function RouteComponent(): JSX.Element {
 	const navigate = Route.useNavigate();
-	const auth = useAuthStore();
+	const auth = useAuth();
 
 	return (
 		<div className="w-full max-w-md mx-auto p-4 flex flex-col gap-6">
@@ -114,7 +115,7 @@ function RouteComponent() {
 
 			<Button
 				onClick={async () => {
-					await auth.logout();
+                    await auth.signOut()
 					navigate({ to: "/sign-in" });
 				}}
 			>
@@ -125,5 +126,3 @@ function RouteComponent() {
 		</div>
 	);
 }
-
-export default RouteComponent;

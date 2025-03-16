@@ -13,7 +13,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Camera } from "lucide-react";
 import { format } from "date-fns"; // <-- Import from date-fns
 
-export const Route = createFileRoute("/status/")({
+export const Route = createFileRoute("/_authed/status/")({
   component: StatusPage,
 });
 

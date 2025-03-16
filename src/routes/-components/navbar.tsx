@@ -38,7 +38,7 @@ export function Navbar(): JSX.Element {
 					</svg>
 				</Link>
 
-				<Link to="/main/map" className={`${location.href === '/main/map' ? 'text-primary' : 'text-foreground'}`}>
+				<Link to="/map" className={`${location.href === '/main/map' ? 'text-primary' : 'text-foreground'}`}>
 					<svg
 						width="25"
 						height="24"
@@ -52,7 +52,7 @@ export function Navbar(): JSX.Element {
 					</svg>
 				</Link>
 
-				<Link to="/main/preferences" className={`${location.href === '/main/preferences' ? 'text-primary' : 'text-foreground'}`}>
+				<Link to="/preferences" className={`${location.href === '/main/preferences' ? 'text-primary' : 'text-foreground'}`}>
 					<svg
 						width="25"
 						height="24"

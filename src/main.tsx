@@ -2,8 +2,8 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider } from "./lib/auth";
-import { useAuth } from "./lib/auth";
+import { AuthProvider } from "./auth";
+import { useAuth } from "./auth";
 
 const queryClient = new QueryClient();
 

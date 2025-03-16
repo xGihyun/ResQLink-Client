@@ -5,24 +5,26 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { resqlinkLogoText } from "@/assets/logos";
 import { EmailIcon } from "@/assets/icons/";
 import { PasswordIcon } from "@/assets/icons/";
-import { useAuthStore } from "@/store/store.auth";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ApiResponse } from "@/lib/api";
+import { setCookie } from "@/lib/cookie";
+import { SignInResponse } from "./-types";
 
 export const Route = createFileRoute("/_auth/sign-in/")({
-  component: RouteComponent,
+	component: RouteComponent,
 });
 
 function RouteComponent() {
@@ -35,26 +37,27 @@ function RouteComponent() {
 		},
 	});
 
-	const auth = useAuthStore();
-
-	// State for toggling password visibility
 	const [isVisible, setIsVisible] = useState(false);
-	const toggleVisibility = () => setIsVisible((prev) => !prev);
 
-	async function onSubmit(values: SignInSchema) {
-		let toastId = toast.loading("Logging in...");
+	async function onSubmit(value: SignInSchema) {
+		let toastId = toast.loading("Signing in...");
 
-		await auth.login(values.email, values.password);
+		const response = await fetch(
+			`${import.meta.env.VITE_BACKEND_URL}/api/sign-in`,
+			{
+				method: "POST",
+				body: JSON.stringify(value),
+				headers: {
+					"Content-Type": "application/json",
+				},
+			},
+		);
+		const result: ApiResponse<SignInResponse> = await response.json();
 
-		if (auth.error) {
-			toast.error(auth.error, { id: toastId });
-			console.error(auth.error);
-			return;
-		}
+        setCookie("session", result.data.token)
+		toast.success(result.message, { id: toastId });
 
-		toast.success("Welcome to ResQLink!", { id: toastId });
-
-		navigate({ to: "/main/map" });
+		navigate({ to: "/map" });
 	}
 
 	return (
@@ -122,7 +125,7 @@ function RouteComponent() {
 											<button
 												type="button"
 												className="absolute transition-all duration-1000 inset-y-0 right-3 flex hover:cursor-pointer h-full w-9 items-center justify-center text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 rounded-e-md outline-none focus:z-10"
-												onClick={toggleVisibility}
+												onClick={() => setIsVisible((prev) => !prev)}
 												aria-label={
 													isVisible ? "Hide password" : "Show password"
 												}

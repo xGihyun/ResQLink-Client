@@ -3,9 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { GoogleMap } from "@capacitor/google-maps";
 import { Geolocation } from "@capacitor/geolocation";
 import { Capacitor } from "@capacitor/core";
-import supabase from "@/lib/supabase";
 
-export const Route = createFileRoute("/main/_root/map/")({
+export const Route = createFileRoute("/_authed/map/")({
 	component: RouteComponent,
 });
 
@@ -30,82 +29,82 @@ type Victim = {
 function RouteComponent() {
 	const mapRef = useRef<HTMLDivElement | null>(null);
 	let newMap: GoogleMap;
-
-	async function createMap() {
-		if (!mapRef.current) return;
-
-		try {
-			newMap = await GoogleMap.create({
-				id: "map",
-				element: mapRef.current,
-				apiKey: "",
-				config: {
-					center: {
-						lat: 33.6,
-						lng: -117.9,
-					},
-					zoom: 2,
-				},
-			});
-			await newMap.enableCurrentLocation(true);
-
-			if (Capacitor.getPlatform() == "android") {
-				const position = await Geolocation.getCurrentPosition();
-				const lat = position.coords.latitude;
-				const long = position.coords.longitude;
-
-				await newMap.addMarker({
-					coordinate: {
-						lat: lat,
-						lng: long,
-					},
-				});
-
-				await newMap.setCamera({
-					coordinate: {
-						lat: lat,
-						lng: long,
-					},
-				});
-			}
-		} catch (error) {}
-	}
-
-	const [priorities, setPriorities] = useState<Victim[]>([]);
-
-	useEffect(() => {
-		const foo = async () => {
-			await createMap();
-
-			const getVictims = async () => {
-				const victims = await supabase
-					.from("victim_reports")
-					.select(`*, users (first_name, last_name)`)
-					.is("responded_at", null);
-
-				setPriorities((victims.data as Victim[]) || []);
-
-				for (const priority of victims.data!) {
-					if (priority.lat === null || priority.long === null) {
-						return;
-					}
-
-					await newMap.addMarkers([
-						{
-							coordinate: {
-								lat: priority.lat,
-								lng: priority.long,
-							},
-						},
-					]);
-				}
-			};
-
-			await getVictims();
-		};
-
-		foo();
-	}, []);
+	//
+	//async function createMap() {
+	//	if (!mapRef.current) return;
+	//
+	//	try {
+	//		newMap = await GoogleMap.create({
+	//			id: "map",
+	//			element: mapRef.current,
+	//			apiKey: "",
+	//			config: {
+	//				center: {
+	//					lat: 33.6,
+	//					lng: -117.9,
+	//				},
+	//				zoom: 2,
+	//			},
+	//		});
+	//		await newMap.enableCurrentLocation(true);
+	//
+	//		if (Capacitor.getPlatform() == "android") {
+	//			const position = await Geolocation.getCurrentPosition();
+	//			const lat = position.coords.latitude;
+	//			const long = position.coords.longitude;
+	//
+	//			await newMap.addMarker({
+	//				coordinate: {
+	//					lat: lat,
+	//					lng: long,
+	//				},
+	//			});
+	//
+	//			await newMap.setCamera({
+	//				coordinate: {
+	//					lat: lat,
+	//					lng: long,
+	//				},
+	//			});
+	//		}
+	//	} catch (error) {}
+	//}
+	//
+	//const [priorities, setPriorities] = useState<Victim[]>([]);
+	//
+	//useEffect(() => {
+	//	const foo = async () => {
+	//		await createMap();
+	//
+	//		const getVictims = async () => {
+	//			const victims = await supabase
+	//				.from("victim_reports")
+	//				.select(`*, users (first_name, last_name)`)
+	//				.is("responded_at", null);
+	//
+	//			setPriorities((victims.data as Victim[]) || []);
+	//
+	//			for (const priority of victims.data!) {
+	//				if (priority.lat === null || priority.long === null) {
+	//					return;
+	//				}
+	//
+	//				await newMap.addMarkers([
+	//					{
+	//						coordinate: {
+	//							lat: priority.lat,
+	//							lng: priority.long,
+	//						},
+	//					},
+	//				]);
+	//			}
+	//		};
+	//
+	//		await getVictims();
+	//	};
+	//
+	//	foo();
+	//}, []);
 
 	return (
 		<div className="w-full h-screen">
@@ -119,9 +118,6 @@ function RouteComponent() {
 				</div>
 
 				<div className="h-32 overflow-y-scroll">
-					{priorities.map((priority) => {
-						return <PriorityItem priority={priority} />;
-					})}
 				</div>
 			</div>
 		</div>

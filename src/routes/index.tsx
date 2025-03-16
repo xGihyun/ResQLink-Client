@@ -12,7 +12,7 @@ function HomeComponent(): JSX.Element {
 
 	useEffect(() => {
 		setTimeout(() => {
-			navigate({ to: "/main/map" });
+			navigate({ to: "/sign-in" });
 		}, 500);
 	});
 

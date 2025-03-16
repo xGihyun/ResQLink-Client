@@ -1,8 +1,6 @@
-import AtRiskIcon from "./AtRiskIcon.svg";
 import ArrowLeft from "./Arrow-Left.svg";
 import Bluetooth from "./Bluetooth.svg";
 import CameraIcon from "./CameraIcon.svg";
-import DangerIcon from "./DangerIcon.svg";
 import EmailIcon from "./EmailIcon.svg";
 import LogoHeader from "./LogoHeader.svg";
 import LogoHeaderText from "./LogoHeaderText.svg";
@@ -14,24 +12,26 @@ import SentimentDistressedl from "./SentimentDistressedl.svg";
 import SentimentNeutral from "./SentimentNeutral.svg";
 import SentimentWorried from "./SentimentWorried.svg";
 import Wifi from "./Wifi.svg";
-import SafeIcon from "./SafeIcon.svg";
+import { SafeIcon } from "./safe-icon";
+import { AtRiskIcon } from "./at-risk-icon.tsx";
+import { DangerIcon } from "./danger-icon.tsx";
 
 export {
-  AtRiskIcon,
-  ArrowLeft,
-  Bluetooth,
-  CameraIcon,
-  DangerIcon,
-  EmailIcon,
-  LogoHeader,
-  LogoHeaderText,
-  IllustrationCitizen,
-  IllustrationResponder,
-  PasswordIcon,
-  LocationIcon,
-  SentimentDistressedl,
-  SentimentNeutral,
-  SentimentWorried,
-  Wifi,
-  SafeIcon,
+	AtRiskIcon,
+	ArrowLeft,
+	Bluetooth,
+	CameraIcon,
+	DangerIcon,
+	EmailIcon,
+	LogoHeader,
+	LogoHeaderText,
+	IllustrationCitizen,
+	IllustrationResponder,
+	PasswordIcon,
+	LocationIcon,
+	SentimentDistressedl,
+	SentimentNeutral,
+	SentimentWorried,
+	Wifi,
+	SafeIcon
 };

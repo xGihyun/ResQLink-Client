@@ -10,7 +10,6 @@ import { PasswordIcon } from "@/assets/icons/";
 import {
 	Form,
 	FormControl,
-	FormDescription,
 	FormField,
 	FormItem,
 	FormLabel,
@@ -21,11 +20,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { resqlinkLogoText } from "@/assets/logos";
 
-import supabase from "@/lib/supabase";
-import { useAuthStore } from "@/store/store.auth";
-import { IllustrationResponder, IllustrationCitizen } from "@/assets/icons";
 import { signUpSchema, SignUpSchema } from "./fillup-form/-schema";
 import { toast } from "sonner";
+import { ApiResponse } from "@/lib/api";
 
 export const Route = createFileRoute("/_auth/sign-up/")({
 	component: RouteComponent,
@@ -33,7 +30,6 @@ export const Route = createFileRoute("/_auth/sign-up/")({
 
 function RouteComponent() {
 	const navigate = Route.useNavigate();
-	const auth = useAuthStore();
 
 	// Set validation mode to "onSubmit" to avoid immediate inline feedback after changes.
 	const form = useForm<SignUpSchema>({
@@ -41,44 +37,34 @@ function RouteComponent() {
 		reValidateMode: "onSubmit",
 		resolver: zodResolver(signUpSchema),
 		defaultValues: {
-			first_name: "",
-			last_name: "",
+			firstName: "",
+			lastName: "",
 			email: "",
 			password: "",
-			confirm_password: "",
-			has_accepted_terms: false,
+			confirmPassword: "",
+			hasAcceptedTerms: false,
 		},
 	});
 
-	// State for toggling password visibility
 	const [isVisible, setIsVisible] = useState(false);
 	const [isVisibleConfirmPass, setIsVisibleConfirmPass] = useState(false);
-	const toggleVisibility = () => setIsVisible((prev) => !prev);
-	const toggleVisibilityConfirmPass = () =>
-		setIsVisibleConfirmPass((prev) => !prev);
 
-	async function onSubmit(values: SignUpSchema) {
-		let toastId = toast.loading("Creating account...");
+	async function onSubmit(value: SignUpSchema) {
+		const toastId = toast.loading("Creating account...");
 
-		const user = await auth.register(values.email, values.password);
+		const response = await fetch(
+			`${import.meta.env.VITE_BACKEND_URL}/api/sign-up`,
+			{
+				method: "POST",
+				body: JSON.stringify(value),
+				headers: {
+					"Content-Type": "application/json"
+				},
+			}
+		);
+		const result: ApiResponse = await response.json();
 
-		if (auth.error || !user) {
-			toast.error(auth.error, { id: toastId });
-			console.error(auth.error);
-			return;
-		}
-
-		await supabase.from("users").insert({
-			user_id: user.id,
-			email: values.email,
-			password: values.password,
-			first_name: values.first_name,
-			last_name: values.last_name,
-			role: "resident",
-			update_frequency: 15,
-		});
-
-		toast.success("Successfully registered!", { id: toastId });
+		toast.success(result.message, { id: toastId });
 
 		navigate({ to: "/sign-in" });
 	}
@@ -94,7 +80,7 @@ function RouteComponent() {
 				>
 					<FormField
 						control={form.control}
-						name="first_name"
+						name="firstName"
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>First Name</FormLabel>
@@ -112,7 +98,7 @@ function RouteComponent() {
 
 					<FormField
 						control={form.control}
-						name="last_name"
+						name="lastName"
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Last Name</FormLabel>
@@ -181,7 +167,7 @@ function RouteComponent() {
 										<button
 											type="button"
 											className="absolute transition-all duration-1000 inset-y-0 right-3 flex hover:cursor-pointer h-full w-9 items-center justify-center text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 rounded-e-md outline-none focus:z-10"
-											onClick={toggleVisibility}
+											onClick={() => setIsVisible((prev) => !prev)}
 											aria-label={isVisible ? "Hide password" : "Show password"}
 											aria-pressed={isVisible}
 										>
@@ -200,7 +186,7 @@ function RouteComponent() {
 
 					<FormField
 						control={form.control}
-						name="confirm_password"
+						name="confirmPassword"
 						render={({ field }) => (
 							<FormItem className="w-full">
 								<FormLabel>Confirm your Password</FormLabel>
@@ -225,7 +211,7 @@ function RouteComponent() {
 										<button
 											type="button"
 											className="absolute transition-all duration-1000 inset-y-0 right-3 flex hover:cursor-pointer h-full w-9 items-center justify-center text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 rounded-e-md outline-none focus:z-10"
-											onClick={toggleVisibilityConfirmPass}
+											onClick={() => setIsVisibleConfirmPass((prev) => !prev)}
 											aria-label={
 												isVisibleConfirmPass
 													? "Hide confirm password"
@@ -248,7 +234,7 @@ function RouteComponent() {
 
 					<FormField
 						control={form.control}
-						name="has_accepted_terms"
+						name="hasAcceptedTerms"
 						render={({ field }) => (
 							<FormItem className="flex flex-col">
 								<div className="flex flex-row items-start space-x-3 space-y-0">
@@ -288,68 +274,6 @@ function RouteComponent() {
 					</p>
 				</form>
 			</Form>
-		</div>
-	);
-  
-	return (
-		<div className="min-h-screen flex flex-col items-center justify-start bg-primary-foreground px-4 md:px-8">
-			<div className="flex flex-col items-center w-full max-w-md mt-12 mx-auto">
-				{/* Logo/Branding */}
-				<img
-					src={resqlinkLogoText}
-					className="mx-auto w-auto h-auto"
-					alt="ResQLink Logo"
-				/>
-
-				<p className="text-base font-playfair-display text-accent font-medium mt-8 text-center max-w-7/12">
-					Register as a <i>responder</i> or <i>citizen</i> and stay informed.
-				</p>
-
-				{/* Card Container */}
-				<div className="grid grid-cols-2 gap-3 mt-12 w-full">
-					{/* Responder Card */}
-					<Link
-						to="/sign-up/fillup-form"
-						className="flex flex-col items-center border-[2.5px]   border-accent rounded-lg p-4
-                       cursor-pointer hover:border-accent-600 transition-colors
-                       focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-600"
-					>
-						<img
-							src={IllustrationResponder}
-							alt="Responder"
-							className="h-36 w-auto"
-						/>
-						<span className="text-sm text-neutral sr-only">
-							Responder Image
-						</span>
-						<p className="font-medium text-accent mt-3">Responder</p>
-					</Link>
-
-					{/* Citizen Card */}
-					<Link
-						to="/sign-up/fillup-form"
-						className="flex flex-col items-center border-[2.5px] border-accent rounded-lg p-4
-                       cursor-pointer hover:border-accent-600 transition-colors
-                       focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-600"
-					>
-						<img
-							src={IllustrationCitizen}
-							alt="Citizen"
-							className="h-36 w-auto"
-						/>
-						<span className="text-sm text-neutral sr-only">Citizen Image</span>
-						<p className="font-medium text-accent mt-3">Citizen</p>
-					</Link>
-				</div>
-
-				{/* Bottom Link */}
-				<Link to="/sign-in" className="text-primary font-normal">
-					<p className="text-center text-sm text-neutral mt-20">
-						Already have an account?{" "}
-						<span className="text-primary font-medium underline">Login</span>
-					</p>
-				</Link>
-			</div>
 		</div>
 	);
 }

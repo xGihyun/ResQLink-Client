@@ -8,10 +8,15 @@ export enum UserRole {
 export type User = {
 	userId: string;
 	createdAt: string;
-	username: string;
-	name: string;
+	updatedAt: string;
+	email: string;
+	firstName: string;
+	middleName?: string;
+	lastName: string;
+	birthDate: string;
 	role: UserRole;
-	avatarUrl?: string;
+	statusUpdateFrequency: number;
+	isLocationShared: boolean;
 };
 
 type Session = {
