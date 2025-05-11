@@ -7,8 +7,8 @@ export const Route = createFileRoute("/_authed/coordination-list/")({
 function RouteComponent() {
   return (
     <div className="min-w-[300px] max-w-full w-full sm:w-[350px] md:w-[400px] p-4 flex flex-col gap-3">
-      <div className="border-b-2 border-[#5bbea9] pb-2">
-        <h2 className="text-[#5bbea9] text-lg font-bold font-playfair-display text-left">
+      <div className="border-b-2 border-primary pb-2">
+        <h2 className="text-primary text-lg font-bold font-playfair-display text-left">
           People Needing Assistance
         </h2>
       </div>
