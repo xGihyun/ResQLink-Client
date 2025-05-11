@@ -4,7 +4,6 @@ import {
 	ReactNode,
 	useContext,
 	useState,
-	useEffect,
 } from "react";
 import { UserSession, getUserSession, User } from "./lib/user";
 import { deleteCookie, getCookie, setCookie } from "./lib/cookie";
@@ -12,7 +11,6 @@ import { ApiResponse } from "./lib/api";
 import { SignInRequest, SignInResponse } from "./routes/_auth/sign-in/-types";
 
 export type AuthContextValue = {
-	user: User | null;
 	validateSession: () => Promise<UserSession | null>;
 	signOut: () => Promise<void>;
 	signIn: (value: SignInRequest) => Promise<ApiResponse<SignInResponse>>;
@@ -86,7 +84,7 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 	}
 
 	return (
-		<AuthContext value={{ user, validateSession, signOut, signIn }}>
+		<AuthContext value={{ validateSession, signOut, signIn }}>
 			{props.children}
 		</AuthContext>
 	);

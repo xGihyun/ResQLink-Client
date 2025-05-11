@@ -19,7 +19,6 @@ import { EmailIcon } from "@/assets/icons/";
 import { PasswordIcon } from "@/assets/icons/";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useAuth } from "@/auth";
 import { SignInRequest } from "./-types";
 
 export const Route = createFileRoute("/_auth/sign-in/")({
@@ -28,7 +27,7 @@ export const Route = createFileRoute("/_auth/sign-in/")({
 
 function RouteComponent() {
 	const navigate = Route.useNavigate();
-	const auth = useAuth();
+	const routeContext = Route.useRouteContext();
 	const form = useForm<SignInRequest>({
 		resolver: zodResolver(signInSchema),
 		defaultValues: {
@@ -42,7 +41,7 @@ function RouteComponent() {
 	async function onSubmit(value: SignInRequest) {
 		let toastId = toast.loading("Signing in...");
 
-		const result = await auth.signIn(value);
+		const result = await routeContext.auth.signIn(value);
 		if (result.code !== 200) {
 			toast.error(result.message, { id: toastId });
 			return;

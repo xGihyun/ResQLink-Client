@@ -8,6 +8,8 @@ export const Route = createFileRoute("/_authed")({
 		if (!userSession) {
 			throw redirect({ to: "/sign-in" });
 		}
+
+		return userSession;
 	},
 });
 
