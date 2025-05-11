@@ -7,12 +7,15 @@ import {
 	useEffect,
 } from "react";
 import { UserSession, getUserSession, User } from "./lib/user";
-import { deleteCookie, getCookie } from "./lib/cookie";
+import { deleteCookie, getCookie, setCookie } from "./lib/cookie";
+import { ApiResponse } from "./lib/api";
+import { SignInRequest, SignInResponse } from "./routes/_auth/sign-in/-types";
 
 export type AuthContextValue = {
 	user: User | null;
 	validateSession: () => Promise<UserSession | null>;
 	signOut: () => Promise<void>;
+	signIn: (value: SignInRequest) => Promise<ApiResponse<SignInResponse>>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -62,8 +65,28 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 		deleteCookie("session");
 	}
 
+	async function signIn(
+		value: SignInRequest,
+	): Promise<ApiResponse<SignInResponse>> {
+		const response = await fetch(
+			`${import.meta.env.VITE_BACKEND_URL}/api/sign-in`,
+			{
+				method: "POST",
+				body: JSON.stringify(value),
+				headers: {
+					"Content-Type": "application/json",
+				},
+			},
+		);
+		const result: ApiResponse<SignInResponse> = await response.json();
+
+		setCookie("session", result.data.token);
+
+		return result;
+	}
+
 	return (
-		<AuthContext value={{ user, validateSession, signOut }}>
+		<AuthContext value={{ user, validateSession, signOut, signIn }}>
 			{props.children}
 		</AuthContext>
 	);

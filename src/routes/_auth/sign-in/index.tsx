@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
-import { signInSchema, SignInSchema } from "./-schema";
+import { signInSchema } from "./-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 
@@ -19,9 +19,8 @@ import { EmailIcon } from "@/assets/icons/";
 import { PasswordIcon } from "@/assets/icons/";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ApiResponse } from "@/lib/api";
-import { setCookie } from "@/lib/cookie";
-import { SignInResponse } from "./-types";
+import { useAuth } from "@/auth";
+import { SignInRequest } from "./-types";
 
 export const Route = createFileRoute("/_auth/sign-in/")({
 	component: RouteComponent,
@@ -29,7 +28,8 @@ export const Route = createFileRoute("/_auth/sign-in/")({
 
 function RouteComponent() {
 	const navigate = Route.useNavigate();
-	const form = useForm<SignInSchema>({
+	const auth = useAuth();
+	const form = useForm<SignInRequest>({
 		resolver: zodResolver(signInSchema),
 		defaultValues: {
 			email: "",
@@ -39,38 +39,30 @@ function RouteComponent() {
 
 	const [isVisible, setIsVisible] = useState(false);
 
-	async function onSubmit(value: SignInSchema) {
+	async function onSubmit(value: SignInRequest) {
 		let toastId = toast.loading("Signing in...");
 
-		const response = await fetch(
-			`${import.meta.env.VITE_BACKEND_URL}/api/sign-in`,
-			{
-				method: "POST",
-				body: JSON.stringify(value),
-				headers: {
-					"Content-Type": "application/json",
-				},
-			},
-		);
-		const result: ApiResponse<SignInResponse> = await response.json();
-
-        setCookie("session", result.data.token)
+		const result = await auth.signIn(value);
+		if (result.code !== 200) {
+			toast.error(result.message, { id: toastId });
+			return;
+		}
 		toast.success(result.message, { id: toastId });
 
-		navigate({ to: "/map" });
+		navigate({ to: "/status" });
 	}
 
 	return (
-		<div className="min-h-screen flex flex-col items-center justify-start bg-primary-foreground px-8 py-6 mt-12 max-w-md mx-auto">
+		<div className="bg-primary-foreground mx-auto mt-12 flex min-h-screen max-w-md flex-col items-center justify-start px-8 py-6">
 			{/* Branding */}
 			<img src={resqlinkLogoText} className="mx-auto" alt="ResQLink Logo" />
 
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit(onSubmit)}
-					className="flex flex-col justify-between items-center h-[60vh] w-full mt-12"
+					className="mt-12 flex h-[60vh] w-full flex-col items-center justify-between"
 				>
-					<div className="flex flex-col gap-y-5 w-full">
+					<div className="flex w-full flex-col gap-y-5">
 						{/* Email Field */}
 						<FormField
 							control={form.control}
@@ -79,16 +71,16 @@ function RouteComponent() {
 								<FormItem className="w-full">
 									<FormLabel>Email</FormLabel>
 									<FormControl>
-										<div className="relative flex items-center w-full">
+										<div className="relative flex w-full items-center">
 											<img
 												src={EmailIcon}
-												className="absolute left-3 w-5 h-5 text-gray-400"
+												className="absolute left-3 h-5 w-5 text-gray-400"
 												alt="Email Icon"
 											/>
 											<Input
 												placeholder="Email"
 												{...field}
-												className="pl-10 min-h-12 bg-input-background"
+												className="bg-input-background min-h-12 pl-10"
 											/>
 										</div>
 									</FormControl>
@@ -105,11 +97,11 @@ function RouteComponent() {
 								<FormItem className="w-full">
 									<FormLabel>Password</FormLabel>
 									<FormControl>
-										<div className="relative flex items-center w-full">
+										<div className="relative flex w-full items-center">
 											{/* Left-side Password Icon */}
 											<img
 												src={PasswordIcon}
-												className="absolute left-3 w-5 h-5 text-gray-400"
+												className="absolute left-3 h-5 w-5 text-gray-400"
 												alt="Password Icon"
 											/>
 
@@ -118,13 +110,13 @@ function RouteComponent() {
 												placeholder="Password"
 												type={isVisible ? "text" : "password"}
 												{...field}
-												className="pl-10 min-h-12 bg-input-background"
+												className="bg-input-background min-h-12 pl-10"
 											/>
 
 											{/* Toggle Visibility Button */}
 											<button
 												type="button"
-												className="absolute transition-all duration-1000 inset-y-0 right-3 flex hover:cursor-pointer h-full w-9 items-center justify-center text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 rounded-e-md outline-none focus:z-10"
+												className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 right-3 flex h-full w-9 items-center justify-center rounded-e-md transition-all duration-1000 outline-none hover:cursor-pointer focus:z-10"
 												onClick={() => setIsVisible((prev) => !prev)}
 												aria-label={
 													isVisible ? "Hide password" : "Show password"
@@ -149,16 +141,16 @@ function RouteComponent() {
 						</p>
 					</div>
 
-					<div className="w-full min-h-12">
-						<Button type="submit" className="w-full min-h-12">
+					<div className="min-h-12 w-full">
+						<Button type="submit" className="min-h-12 w-full">
 							Login
 						</Button>
 
-						<p className="text-center text-sm text-neutral mx-auto hover:underline">
+						<p className="text-neutral mx-auto text-center text-sm hover:underline">
 							Don't have an account?{" "}
 							<Link
 								to="/sign-up"
-								className="underline text-primary font-medium"
+								className="text-primary font-medium underline"
 							>
 								Register
 							</Link>
