@@ -1,19 +1,22 @@
-import {
-	createContext,
-	JSX,
-	ReactNode,
-	useContext,
-	useState,
-} from "react";
+import { createContext, JSX, ReactNode, useContext, useState } from "react";
 import { UserSession, getUserSession, User } from "./lib/user";
 import { deleteCookie, getCookie, setCookie } from "./lib/cookie";
 import { ApiResponse } from "./lib/api";
 import { SignInRequest, SignInResponse } from "./routes/_auth/sign-in/-types";
+import { SignInAnonymousSchema } from "./routes/_auth/sign-in/anonymous/-schema";
+import {
+	SignInAnonymousRequest,
+	SignInAnonymousResponse,
+} from "./routes/_auth/sign-in/anonymous/-types";
 
 export type AuthContextValue = {
 	validateSession: () => Promise<UserSession | null>;
 	signOut: () => Promise<void>;
 	signIn: (value: SignInRequest) => Promise<ApiResponse<SignInResponse>>;
+	signInAnonymous: (
+		value: SignInAnonymousSchema,
+		id: string,
+	) => Promise<ApiResponse<SignInAnonymousResponse>>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -83,8 +86,35 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 		return result;
 	}
 
+	async function signInAnonymous(
+		value: SignInAnonymousSchema,
+		id: string,
+	): Promise<ApiResponse<SignInAnonymousResponse>> {
+		const request: SignInAnonymousRequest = {
+			anonymousId: id,
+		};
+
+		const response = await fetch(
+			`${import.meta.env.VITE_BACKEND_URL}/api/sign-in/anonymous`,
+			{
+				method: "POST",
+				body: JSON.stringify(request),
+				headers: {
+					"Content-Type": "application/json",
+				},
+			},
+		);
+		const result: ApiResponse<SignInAnonymousResponse> = await response.json();
+
+		// TODO: Store `anonymousId` and `value` locally
+
+		setCookie("session", result.data.token);
+
+		return result;
+	}
+
 	return (
-		<AuthContext value={{ validateSession, signOut, signIn }}>
+		<AuthContext value={{ validateSession, signOut, signIn, signInAnonymous }}>
 			{props.children}
 		</AuthContext>
 	);

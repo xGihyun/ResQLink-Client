@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { anonymousSignUpSchema, AnonymousSignUpSchema } from "./-schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { resqlinkLogoText } from "@/assets/logos";
@@ -14,49 +13,52 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { signInAnonymousSchema, SignInAnonymousSchema } from "./-schema";
+import { JSX } from "react";
 
 export const Route = createFileRoute("/_auth/sign-in/anonymous/")({
 	component: RouteComponent,
 });
 
-function RouteComponent() {
+function RouteComponent(): JSX.Element {
 	const navigate = Route.useNavigate();
+	const routeContext = Route.useRouteContext();
 
 	// Set validation mode to "onSubmit" to avoid immediate inline feedback after changes.
-	const form = useForm<AnonymousSignUpSchema>({
+	const form = useForm<SignInAnonymousSchema>({
 		mode: "onSubmit",
 		reValidateMode: "onSubmit",
-		resolver: zodResolver(anonymousSignUpSchema),
+		resolver: zodResolver(signInAnonymousSchema),
 		defaultValues: {
 			firstName: "",
 			lastName: "",
 		},
 	});
 
-	async function onSubmit(value: AnonymousSignUpSchema) {
-		let toastId = toast.loading("Logging in...");
+	async function onSubmit(value: SignInAnonymousSchema) {
+		let toastId = toast.loading("Signing in...");
 
-		//await auth.loginAnonymous()
-		//
-		//if (auth.error) {
-		//	toast.error(auth.error, { id: toastId });
-		//	console.error(auth.error);
-		//	return;
-		//}
+		const result = await routeContext.auth.signInAnonymous(
+			value,
+			"random-uuid",
+		);
+		if (result.code !== 200) {
+			toast.error(result.message, { id: toastId });
+			return;
+		}
+		toast.success(result.message, { id: toastId });
 
-		toast.success("Welcome to ResQLink!", { id: toastId });
-
-		navigate({ to: "/main/map" });
+		navigate({ to: "/status" });
 	}
 
 	return (
-		<div className="min-h-screen flex flex-col items-center justify-start px-5 py-10">
+		<div className="flex min-h-screen flex-col items-center justify-start px-5 py-10">
 			<img src={resqlinkLogoText} className="mx-auto" />
 
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit(onSubmit)}
-					className="space-y-8 mt-12 min-w-[300px] w-full max-w-md"
+					className="mt-12 w-full max-w-md min-w-[300px] space-y-8"
 				>
 					<FormField
 						control={form.control}
@@ -66,7 +68,7 @@ function RouteComponent() {
 								<FormLabel>First Name</FormLabel>
 								<FormControl>
 									<Input
-										className="min-h-12 bg-input-background"
+										className="bg-input-background min-h-12"
 										placeholder="First Name"
 										{...field}
 									/>
@@ -84,7 +86,7 @@ function RouteComponent() {
 								<FormLabel>Last Name</FormLabel>
 								<FormControl>
 									<Input
-										className="min-h-12 bg-input-background"
+										className="bg-input-background min-h-12"
 										placeholder="Last Name"
 										{...field}
 									/>
@@ -94,13 +96,13 @@ function RouteComponent() {
 						)}
 					/>
 
-					<Button type="submit" className="w-full min-h-12">
+					<Button type="submit" className="min-h-12 w-full">
 						Continue as Guest
 					</Button>
 
-					<p className="text-sm text-center  text-neutral mx-auto hover:underline">
+					<p className="text-neutral mx-auto text-center text-sm hover:underline">
 						Already have an account?{" "}
-						<Link className="underline text-primary" to="/sign-in">
+						<Link className="text-primary underline" to="/sign-in">
 							Sign In
 						</Link>
 					</p>

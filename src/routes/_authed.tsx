@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { Navbar } from "./-components/navbar";
+import { JSX } from "react";
 
 export const Route = createFileRoute("/_authed")({
 	component: RouteComponent,
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/_authed")({
 	},
 });
 
-function RouteComponent() {
+function RouteComponent(): JSX.Element {
 	return (
 		<div className="h-svh content-center">
 			<Navbar />

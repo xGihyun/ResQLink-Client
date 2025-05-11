@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { JSX } from "react";
 
 export const Route = createFileRoute("/_auth")({
 	component: RouteComponent,
@@ -10,7 +11,7 @@ export const Route = createFileRoute("/_auth")({
 	},
 });
 
-function RouteComponent() {
+function RouteComponent(): JSX.Element {
 	return (
 		<div className="h-svh content-center">
 			<Outlet />

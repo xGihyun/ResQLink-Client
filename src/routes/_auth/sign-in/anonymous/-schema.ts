@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const anonymousSignUpSchema = z.object({
+export const signInAnonymousSchema = z.object({
 	firstName: z
 		.string()
 		.min(2, "First name must be at least 2 characters")
@@ -11,4 +11,4 @@ export const anonymousSignUpSchema = z.object({
 		.max(18, "Last name must be at most 18 characters"),
 });
 
-export type AnonymousSignUpSchema = z.infer<typeof anonymousSignUpSchema>;
+export type SignInAnonymousSchema = z.infer<typeof signInAnonymousSchema>;
