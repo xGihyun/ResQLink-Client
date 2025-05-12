@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { signInAnonymousSchema, SignInAnonymousSchema } from "./-schema";
 import { JSX } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 export const Route = createFileRoute("/_auth/sign-in/anonymous/")({
 	component: RouteComponent,
@@ -38,10 +39,8 @@ function RouteComponent(): JSX.Element {
 	async function onSubmit(value: SignInAnonymousSchema) {
 		let toastId = toast.loading("Signing in...");
 
-		const result = await routeContext.auth.signInAnonymous(
-			value,
-			"random-uuid",
-		);
+		const id = uuidv4();
+		const result = await routeContext.auth.signInAnonymous(value, id);
 		if (result.code !== 200) {
 			toast.error(result.message, { id: toastId });
 			return;
