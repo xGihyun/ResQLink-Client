@@ -55,6 +55,7 @@ function RouteComponent() {
 		<div className="bg-primary-foreground mx-auto mt-12 flex min-h-screen max-w-md flex-col items-center justify-start px-8 py-6">
 			{/* Branding */}
 			<img src={resqlinkLogoText} className="mx-auto" alt="ResQLink Logo" />
+            <h1 className="text-primary font-playfair-display-black">ResQLink</h1>
 
 			<Form {...form}>
 				<form
