@@ -28,7 +28,7 @@ import { CitizenStatus } from "./-types";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authed/dashboard/")({
+export const Route = createFileRoute("/_authed/report/")({
 	component: RouteComponent,
 });
 
@@ -40,6 +40,33 @@ type StatusOption = {
 	checkInDetails: string;
 	icon: JSX.Element;
 };
+
+const STATUS_OPTIONS: StatusOption[] = [
+	{
+		label: "Safe",
+		value: CitizenStatus.Safe,
+		class: "bg-primary",
+		description: "I am safe and well",
+		checkInDetails: "Check-ins every 24 hours",
+		icon: <ShieldCheck className="text-white" />,
+	},
+	{
+		label: "At Risk",
+		value: CitizenStatus.AtRisk,
+		class: "bg-[#ffb74d]",
+		description: "I may need assistance soon",
+		checkInDetails: "Check-ins every 8 hours",
+		icon: <AlertTriangle className="text-white" />,
+	},
+	{
+		label: "In Danger",
+		value: CitizenStatus.InDanger,
+		class: "bg-[#e57373]",
+		description: "I need immediate help",
+		checkInDetails: "Check-ins every hour",
+		icon: <ShieldAlert className="text-white" />,
+	},
+];
 
 function RouteComponent(): JSX.Element {
 	const [showModal, setShowModal] = useState(false);
@@ -58,34 +85,6 @@ function RouteComponent(): JSX.Element {
 
 		setTimeout(() => setShowModal(false), 2000); // Auto-hide modal after 2 sec
 	}
-
-	// Status options configuration.
-	const statusOptions: StatusOption[] = [
-		{
-			label: "Safe",
-			value: CitizenStatus.Safe,
-			class: "bg-green-500",
-			description: "I am safe and well",
-			checkInDetails: "Check-ins every 24 hours",
-			icon: <ShieldCheck className="text-white" />,
-		},
-		{
-			label: "At Risk",
-			value: CitizenStatus.AtRisk,
-			class: "bg-[#ffb74d]",
-			description: "I may need assistance soon",
-			checkInDetails: "Check-ins every 8 hours",
-			icon: <AlertTriangle className="text-white" />,
-		},
-		{
-			label: "In Danger",
-			value: CitizenStatus.InDanger,
-			class: "bg-[#e57373]",
-			description: "I need immediate help",
-			checkInDetails: "Check-ins every hour",
-			icon: <ShieldAlert className="text-white" />,
-		},
-	];
 
 	async function handleTakePhoto(): Promise<void> {
 		try {
@@ -147,7 +146,7 @@ function RouteComponent(): JSX.Element {
 										onValueChange={field.onChange}
 										defaultValue={field.value}
 									>
-										{statusOptions.map((statusOption) => (
+										{STATUS_OPTIONS.map((statusOption) => (
 											<FormItem>
 												<FormControl>
 													<div
