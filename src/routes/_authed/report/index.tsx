@@ -14,13 +14,13 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { ShieldCheck, AlertTriangle, ShieldAlert } from "lucide-react";
-import { statusSchema, StatusSchema } from "./-schema";
+import { reportSchema, ReportSchema } from "./-schema";
 import { JSX } from "react";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { StatusItem } from "./-components/status-item";
 import { CitizenStatus } from "./-types";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
+import { cn, formatName } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authed/report/")({
@@ -64,14 +64,24 @@ const STATUS_OPTIONS: StatusOption[] = [
 ];
 
 function RouteComponent(): JSX.Element {
+	const routeContext = Route.useRouteContext();
 	const [photoSrc, setPhotoSrc] = useState<string | null>(null);
 
-	const form = useForm<StatusSchema>({
-		resolver: zodResolver(statusSchema),
-		defaultValues: { status: undefined, description: "", photo: "" },
+	const form = useForm<ReportSchema>({
+		resolver: zodResolver(reportSchema),
+		defaultValues: {
+			userId: routeContext.user.userId,
+			rawSituation: "",
+			photos: "",
+			name: formatName({
+				firstName: routeContext.user.firstName,
+				middleName: routeContext.user.middleName,
+				lastName: routeContext.user.lastName,
+			}),
+		},
 	});
 
-	async function onSubmit(data: StatusSchema): Promise<void> {
+	async function onSubmit(data: ReportSchema): Promise<void> {
 		console.log("Form Data:", data);
 
 		// TODO: Fetch inference
@@ -86,7 +96,7 @@ function RouteComponent(): JSX.Element {
 			const photoUrl = photo.webPath || null;
 			setPhotoSrc(photoUrl);
 			if (photoUrl) {
-				form.setValue("photo", photoUrl);
+				form.setValue("photos", photoUrl);
 			}
 		} catch (error) {
 			console.error("Error taking photo:", error);
@@ -100,7 +110,7 @@ function RouteComponent(): JSX.Element {
 				const fileBlob = result.files[0].blob!;
 				const objectUrl = URL.createObjectURL(fileBlob);
 				setPhotoSrc(objectUrl);
-				form.setValue("photo", fileBlob);
+				form.setValue("photos", fileBlob);
 			}
 		} catch (error) {
 			console.error("Error picking file:", error);
@@ -137,7 +147,7 @@ function RouteComponent(): JSX.Element {
 										defaultValue={field.value}
 									>
 										{STATUS_OPTIONS.map((statusOption) => (
-											<FormItem>
+											<FormItem key={statusOption.value}>
 												<FormControl>
 													<div
 														className={cn(
@@ -153,8 +163,11 @@ function RouteComponent(): JSX.Element {
 
 														<div className="flex grow items-center gap-3">
 															{statusOption.icon}
-															<div className="grid grow gap-2">
-																<Label htmlFor={statusOption.value}>
+															<div className="grid grow gap-0">
+																<Label
+																	htmlFor={statusOption.value}
+																	className="font-playfair-display-black text-xl"
+																>
 																	{statusOption.label}
 																</Label>
 																<p className="text-xs">
@@ -175,14 +188,14 @@ function RouteComponent(): JSX.Element {
 
 					<FormField
 						control={form.control}
-						name="description"
+						name="rawSituation"
 						render={({ field, fieldState }) => (
 							<FormItem className="w-full">
 								<FormLabel className="font-playfair-display-semibold text-base">
 									Describe Your Situation
 								</FormLabel>
 								<FormControl>
-									<Textarea {...field} />
+									<Textarea {...field} className="text-base" />
 								</FormControl>
 								<FormMessage>{fieldState.error?.message}</FormMessage>
 							</FormItem>
@@ -204,7 +217,7 @@ function RouteComponent(): JSX.Element {
 
 						<FormField
 							control={form.control}
-							name="photo"
+							name="photos"
 							render={({ fieldState }) => (
 								<FormItem>
 									<FormMessage>{fieldState.error?.message}</FormMessage>
