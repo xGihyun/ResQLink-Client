@@ -7,7 +7,7 @@ export function Navbar(): JSX.Element {
 	return (
 		<nav className="w-full h-20 fixed bottom-0 left-0 bg-background px-5 content-center">
 			<div className="w-full flex items-center justify-center gap-10">
-				<Link to="/dashboard" className={`${location.href === '/dashboard' ? 'text-primary' : 'text-foreground'}`}>
+				<Link to="/report" className={`${location.href === '/report' ? 'text-primary' : 'text-foreground'}`}>
 					<svg
 						width="25"
 						height="24"
@@ -38,7 +38,7 @@ export function Navbar(): JSX.Element {
 					</svg>
 				</Link>
 
-				<Link to="/map" className={`${location.href === '/main/map' ? 'text-primary' : 'text-foreground'}`}>
+				<Link to="/map" className={`${location.href === '/map' ? 'text-primary' : 'text-foreground'}`}>
 					<svg
 						width="25"
 						height="24"

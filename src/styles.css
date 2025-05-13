@@ -11,6 +11,18 @@
 }
 
 @font-face {
+	font-family: "Playfair Display SemiBold";
+	font-display: swap;
+	src: url("/fonts/playfair-display/PlayfairDisplay-SemiBold.ttf");
+}
+
+@font-face {
+	font-family: "Playfair Display Bold";
+	font-display: swap;
+	src: url("/fonts/playfair-display/PlayfairDisplay-Bold.ttf");
+}
+
+@font-face {
 	font-family: "Playfair Display Black";
 	font-display: swap;
 	src: url("/fonts/playfair-display/PlayfairDisplay-Black.ttf");
@@ -89,6 +101,8 @@
 
 @theme inline {
 	--font-playfair-display: "Playfair Display";
+	--font-playfair-display-semibold: "Playfair Display SemiBold";
+	--font-playfair-display-bold: "Playfair Display Bold";
 	--font-playfair-display-black: "Playfair Display Black";
 	--font-poppins: "Poppins";
 	--font-poppins-bold: "Poppins Bold";

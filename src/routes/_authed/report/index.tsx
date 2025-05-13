@@ -13,13 +13,7 @@ import {
 	FormControl,
 	FormMessage,
 } from "@/components/ui/form";
-import {
-	CheckCircle,
-	ShieldCheck,
-	AlertTriangle,
-	ShieldAlert,
-	X,
-} from "lucide-react";
+import { ShieldCheck, AlertTriangle, ShieldAlert } from "lucide-react";
 import { statusSchema, StatusSchema } from "./-schema";
 import { JSX } from "react";
 import { RadioGroup } from "@/components/ui/radio-group";
@@ -27,6 +21,7 @@ import { StatusItem } from "./-components/status-item";
 import { CitizenStatus } from "./-types";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authed/report/")({
 	component: RouteComponent,
@@ -69,7 +64,6 @@ const STATUS_OPTIONS: StatusOption[] = [
 ];
 
 function RouteComponent(): JSX.Element {
-	const [showModal, setShowModal] = useState(false);
 	const [photoSrc, setPhotoSrc] = useState<string | null>(null);
 
 	const form = useForm<StatusSchema>({
@@ -79,11 +73,8 @@ function RouteComponent(): JSX.Element {
 
 	async function onSubmit(data: StatusSchema): Promise<void> {
 		console.log("Form Data:", data);
-		setShowModal(true);
 
 		// TODO: Fetch inference
-
-		setTimeout(() => setShowModal(false), 2000); // Auto-hide modal after 2 sec
 	}
 
 	async function handleTakePhoto(): Promise<void> {
@@ -119,27 +110,26 @@ function RouteComponent(): JSX.Element {
 	return (
 		<div className="mx-auto flex h-screen w-full max-w-md min-w-[300px] flex-col items-center justify-start gap-6 p-4">
 			<div className="flex w-full flex-col gap-3">
-				<div className="font-playfair-display text-left text-2xl font-black text-[#5bbea9]">
+				<div className="font-playfair-display-black text-primary text-2xl">
 					Emergency Status Update
 				</div>
-				<div className="border border-[#5bbea9]"></div>
+				<hr className="border-primary border" />
 			</div>
 
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit(onSubmit)}
-					className="flex w-full flex-col gap-4"
+					className="w-full space-y-4"
 				>
-					<div className="font-playfair-display mb-2 w-full text-left text-base font-semibold text-black">
-						How are You?
-					</div>
-
-					{/* Status Selection */}
 					<FormField
 						control={form.control}
 						name="status"
 						render={({ field, fieldState }) => (
 							<FormItem>
+								<FormLabel className="font-playfair-display-semibold text-base">
+									How are You?
+								</FormLabel>
+
 								<FormControl>
 									<RadioGroup
 										className="gap-2"
@@ -183,13 +173,12 @@ function RouteComponent(): JSX.Element {
 						)}
 					/>
 
-					{/* Description field */}
 					<FormField
 						control={form.control}
 						name="description"
 						render={({ field, fieldState }) => (
-							<FormItem className="flex w-full flex-col gap-3">
-								<FormLabel className="font-playfair-display text-base font-semibold text-black">
+							<FormItem className="w-full">
+								<FormLabel className="font-playfair-display-semibold text-base">
 									Describe Your Situation
 								</FormLabel>
 								<FormControl>
@@ -200,37 +189,19 @@ function RouteComponent(): JSX.Element {
 						)}
 					/>
 
-					{/* Photo Evidence Section */}
 					<div className="flex w-full flex-col gap-3">
-						<div className="font-playfair-display text-base font-semibold text-black">
+						<div className="font-playfair-display-semibold text-base">
 							Add Photo Evidence
 						</div>
 						<div className="flex w-full flex-col gap-2">
-							<button
-								type="button"
-								onClick={handleTakePhoto}
-								className="min-h-12 w-full rounded-lg bg-[#5bbea9] font-['Poppins'] text-sm font-bold text-white"
-							>
+							<Button onClick={handleTakePhoto} size="lg">
 								Take Photo
-							</button>
-							<button
-								type="button"
-								onClick={handleUploadImage}
-								className="min-h-12 w-full rounded-lg bg-[#6f7ec6] font-['Poppins'] text-sm font-bold text-white"
-							>
+							</Button>
+							<Button onClick={handleUploadImage} size="lg" variant="secondary">
 								Upload Image
-							</button>
+							</Button>
 						</div>
-						{photoSrc && (
-							<div className="mt-4">
-								<img
-									src={photoSrc}
-									alt="Photo Evidence"
-									className="h-auto w-full rounded-md"
-								/>
-							</div>
-						)}
-						{/* Optional: Display error message for photo field */}
+
 						<FormField
 							control={form.control}
 							name="photo"
@@ -242,32 +213,11 @@ function RouteComponent(): JSX.Element {
 						/>
 					</div>
 
-					<button
-						type="submit"
-						className="mt-4 w-full rounded-lg bg-[#5bbea9] py-3 font-['Poppins'] text-sm font-bold text-white"
-					>
-						Submit Update
-					</button>
+					<Button type="submit" size="lg" className="font-poppins-bold w-full">
+						Submit
+					</Button>
 				</form>
 			</Form>
-
-			{/* Success Modal */}
-			{showModal && (
-				<div className="bg-opacity-50 fixed inset-0 flex items-center justify-center bg-black">
-					<div className="flex flex-col items-center gap-4 rounded-lg bg-white p-6 shadow-lg">
-						<CheckCircle className="h-12 w-12 text-green-500" />
-						<p className="font-playfair-display text-lg font-semibold text-gray-800">
-							Status Submitted Successfully!
-						</p>
-						<button
-							onClick={() => setShowModal(false)}
-							className="text-gray-500 hover:text-gray-700"
-						>
-							<X className="h-6 w-6" />
-						</button>
-					</div>
-				</div>
-			)}
 		</div>
 	);
 }

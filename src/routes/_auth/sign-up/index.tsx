@@ -18,9 +18,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { resqlinkLogoText } from "@/assets/logos";
 
-import { signUpSchema, SignUpSchema } from "./fillup-form/-schema";
+import { signUpSchema, SignUpSchema } from "./-schema";
 import { toast } from "sonner";
 import { ApiResponse } from "@/lib/api";
 
