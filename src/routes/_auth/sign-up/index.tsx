@@ -50,7 +50,7 @@ function RouteComponent() {
 	const [isVisibleConfirmPass, setIsVisibleConfirmPass] = useState(false);
 
 	async function onSubmit(value: SignUpSchema) {
-		const toastId = toast.loading("Creating account...");
+		const toastId = toast.loading("Signing up...");
 
 		const response = await fetch(
 			`${import.meta.env.VITE_BACKEND_URL}/api/sign-up`,
@@ -58,11 +58,15 @@ function RouteComponent() {
 				method: "POST",
 				body: JSON.stringify(value),
 				headers: {
-					"Content-Type": "application/json"
+					"Content-Type": "application/json",
 				},
-			}
+			},
 		);
 		const result: ApiResponse = await response.json();
+		if (result.code !== 200) {
+			toast.error(result.message, { id: toastId });
+			return;
+		}
 
 		toast.success(result.message, { id: toastId });
 
@@ -70,14 +74,12 @@ function RouteComponent() {
 	}
 
 	return (
-		<div className="min-h-screen flex flex-col items-center justify-start px-5 py-10">
-			<img src={resqlinkLogoText} className="mx-auto" />
-
-			<Form {...form}>
-				<form
-					onSubmit={form.handleSubmit(onSubmit)}
-					className="space-y-8 mt-12"
-				>
+		<Form {...form}>
+			<form
+				onSubmit={form.handleSubmit(onSubmit)}
+				className="mt-12 flex h-full w-full flex-col items-center justify-between gap-4"
+			>
+				<div className="w-full space-y-4">
 					<FormField
 						control={form.control}
 						name="firstName"
@@ -86,7 +88,7 @@ function RouteComponent() {
 								<FormLabel>First Name</FormLabel>
 								<FormControl>
 									<Input
-										className="min-h-12 bg-input-background"
+										className="min-h-12"
 										placeholder="First Name"
 										{...field}
 									/>
@@ -104,7 +106,7 @@ function RouteComponent() {
 								<FormLabel>Last Name</FormLabel>
 								<FormControl>
 									<Input
-										className="min-h-12 bg-input-background"
+										className="min-h-12"
 										placeholder="Last Name"
 										{...field}
 									/>
@@ -121,16 +123,16 @@ function RouteComponent() {
 							<FormItem>
 								<FormLabel>Email</FormLabel>
 								<FormControl>
-									<div className="relative flex items-center w-full">
+									<div className="relative flex w-full items-center">
 										<img
 											src={EmailIcon}
-											className="absolute left-3 w-5 h-5 text-gray-400"
+											className="absolute left-3 h-5 w-5 text-gray-400"
 											alt="Email Icon"
 										/>
 										<Input
 											placeholder="Email"
 											{...field}
-											className="pl-10 min-h-12 bg-input-background"
+											className="min-h-12 pl-10"
 										/>
 									</div>
 								</FormControl>
@@ -147,11 +149,11 @@ function RouteComponent() {
 							<FormItem className="w-full">
 								<FormLabel>Password</FormLabel>
 								<FormControl>
-									<div className="relative flex items-center w-full">
+									<div className="relative flex w-full items-center">
 										{/* Left-side Password Icon */}
 										<img
 											src={PasswordIcon}
-											className="absolute left-3 w-5 h-5 text-gray-400"
+											className="absolute left-3 h-5 w-5 text-gray-400"
 											alt="Password Icon"
 										/>
 
@@ -160,13 +162,13 @@ function RouteComponent() {
 											placeholder="Password"
 											type={isVisible ? "text" : "password"}
 											{...field}
-											className="pl-10 min-h-12 bg-input-background"
+											className="min-h-12 pl-10"
 										/>
 
 										{/* Toggle Visibility Button */}
 										<button
 											type="button"
-											className="absolute transition-all duration-1000 inset-y-0 right-3 flex hover:cursor-pointer h-full w-9 items-center justify-center text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 rounded-e-md outline-none focus:z-10"
+											className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 right-3 flex h-full w-9 items-center justify-center rounded-e-md transition-all duration-1000 outline-none hover:cursor-pointer focus:z-10"
 											onClick={() => setIsVisible((prev) => !prev)}
 											aria-label={isVisible ? "Hide password" : "Show password"}
 											aria-pressed={isVisible}
@@ -191,11 +193,11 @@ function RouteComponent() {
 							<FormItem className="w-full">
 								<FormLabel>Confirm your Password</FormLabel>
 								<FormControl>
-									<div className="relative flex items-center w-full">
+									<div className="relative flex w-full items-center">
 										{/* Left-side Password Icon */}
 										<img
 											src={PasswordIcon}
-											className="absolute left-3 w-5 h-5 text-gray-400"
+											className="absolute left-3 h-5 w-5 text-gray-400"
 											alt="Password Icon"
 										/>
 
@@ -204,13 +206,13 @@ function RouteComponent() {
 											placeholder="Confirm Password"
 											type={isVisibleConfirmPass ? "text" : "password"}
 											{...field}
-											className="pl-10 min-h-12 bg-input-background"
+											className="min-h-12 pl-10"
 										/>
 
 										{/* Toggle Visibility Button */}
 										<button
 											type="button"
-											className="absolute transition-all duration-1000 inset-y-0 right-3 flex hover:cursor-pointer h-full w-9 items-center justify-center text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 rounded-e-md outline-none focus:z-10"
+											className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 right-3 flex h-full w-9 items-center justify-center rounded-e-md transition-all duration-1000 outline-none hover:cursor-pointer focus:z-10"
 											onClick={() => setIsVisibleConfirmPass((prev) => !prev)}
 											aria-label={
 												isVisibleConfirmPass
@@ -237,43 +239,45 @@ function RouteComponent() {
 						name="hasAcceptedTerms"
 						render={({ field }) => (
 							<FormItem className="flex flex-col">
-								<div className="flex flex-row items-start space-x-3 space-y-0">
+								<div className="flex flex-row items-center space-y-0 space-x-3">
 									<FormControl>
 										<Checkbox
 											checked={field.value}
 											onCheckedChange={field.onChange}
 										/>
 									</FormControl>
-									<FormLabel className="font-light text-sm">
-										By continuing, you accept our{" "}
-										<span className="underline text-primary">
+									<FormLabel className="text-sm font-light">
+										I accept the{" "}
+										<span className="text-primary underline">
 											Privacy Policy
 										</span>{" "}
 										and{" "}
-										<span className="underline text-primary">Terms of Use</span>
+										<span className="text-primary underline">Terms of Use</span>
 									</FormLabel>
 								</div>
 								<FormMessage />
 							</FormItem>
 						)}
 					/>
+				</div>
 
-					<Button type="submit" className="w-full min-h-12">
-						Register
+				<div className="min-h-12 w-full space-y-4">
+					<Button type="submit" className="font-poppins-bold min-h-12 w-full">
+						Sign Up
 					</Button>
 
-					<p className="text-sm text-center  text-neutral mx-auto hover:underline">
+					<p className="text-neutral mx-auto text-center text-sm">
 						Already have an account?{" "}
-						<Link className="underline text-primary" to="/sign-in">
+						<Link className="text-primary underline" to="/sign-in">
 							Log In
 						</Link>{" "}
 						or{" "}
-						<Link className="underline text-primary" to="/sign-in/anonymous">
+						<Link className="text-primary underline" to="/sign-in/anonymous">
 							Continue as Guest
 						</Link>
 					</p>
-				</form>
-			</Form>
-		</div>
+				</div>
+			</form>
+		</Form>
 	);
 }

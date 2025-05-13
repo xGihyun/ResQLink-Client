@@ -13,8 +13,13 @@ export const Route = createFileRoute("/_auth")({
 
 function RouteComponent(): JSX.Element {
 	return (
-		<div className="h-svh content-center">
+		<main className="bg-primary-foreground mx-auto flex h-full max-w-md flex-col items-center justify-start px-8 py-18">
+			<header className="text-primary text-center">
+				<h1 className="font-playfair-display-black text-4xl">ResQLink</h1>
+				<p>Stay Safe and Connected</p>
+			</header>
+
 			<Outlet />
-		</div>
+		</main>
 	);
 }

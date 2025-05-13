@@ -22,6 +22,12 @@
 	src: url("/fonts/poppins/Poppins-Regular.ttf");
 }
 
+@font-face {
+	font-family: "Poppins Bold";
+	font-display: swap;
+	src: url("/fonts/poppins/Poppins-Bold.ttf");
+}
+
 :root {
 	--background: hsl(167 43% 96%);
 	--foreground: hsl(166 42% 6%);
@@ -85,6 +91,7 @@
 	--font-playfair-display: "Playfair Display";
 	--font-playfair-display-black: "Playfair Display Black";
 	--font-poppins: "Poppins";
+	--font-poppins-bold: "Poppins Bold";
 
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
@@ -146,4 +153,8 @@ capacitor-google-map {
 	display: inline-block;
 	width: 275px;
 	height: 400px;
+}
+
+:where(button, [role="button"]):not([disabled]) {
+	cursor: pointer;
 }

@@ -51,14 +51,12 @@ function RouteComponent(): JSX.Element {
 	}
 
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-start px-5 py-10">
-			<img src={resqlinkLogoText} className="mx-auto" />
-
-			<Form {...form}>
-				<form
-					onSubmit={form.handleSubmit(onSubmit)}
-					className="mt-12 w-full max-w-md min-w-[300px] space-y-8"
-				>
+		<Form {...form}>
+			<form
+				onSubmit={form.handleSubmit(onSubmit)}
+				className="mt-12 flex h-full w-full flex-col items-center justify-between gap-4"
+			>
+				<div className="w-full space-y-4">
 					<FormField
 						control={form.control}
 						name="firstName"
@@ -67,7 +65,7 @@ function RouteComponent(): JSX.Element {
 								<FormLabel>First Name</FormLabel>
 								<FormControl>
 									<Input
-										className="bg-input-background min-h-12"
+										className="min-h-12"
 										placeholder="First Name"
 										{...field}
 									/>
@@ -85,7 +83,7 @@ function RouteComponent(): JSX.Element {
 								<FormLabel>Last Name</FormLabel>
 								<FormControl>
 									<Input
-										className="bg-input-background min-h-12"
+										className="min-h-12"
 										placeholder="Last Name"
 										{...field}
 									/>
@@ -94,19 +92,21 @@ function RouteComponent(): JSX.Element {
 							</FormItem>
 						)}
 					/>
+				</div>
 
-					<Button type="submit" className="min-h-12 w-full">
+				<div className="w-full space-y-4">
+					<Button type="submit" className="font-poppins-bold min-h-12 w-full">
 						Continue as Guest
 					</Button>
 
-					<p className="text-neutral mx-auto text-center text-sm hover:underline">
+					<p className="text-neutral mx-auto text-center text-sm">
 						Already have an account?{" "}
 						<Link className="text-primary underline" to="/sign-in">
 							Sign In
 						</Link>
 					</p>
-				</form>
-			</Form>
-		</div>
+				</div>
+			</form>
+		</Form>
 	);
 }
