@@ -47,7 +47,7 @@ function RouteComponent() {
 		}
 		toast.success(result.message, { id: toastId });
 
-		navigate({ to: "/status" });
+		navigate({ to: "/report" });
 	}
 
 	return (
