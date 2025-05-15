@@ -6,10 +6,12 @@ export const signUpSchema = z
 			.string()
 			.min(2, "First name must be at least 2 characters")
 			.max(18, "First name must be at most 18 characters"),
+		middleName: z.string().optional(),
 		lastName: z
 			.string()
 			.min(2, "Last name must be at least 2 characters")
 			.max(18, "Last name must be at most 18 characters"),
+		birthDate: z.string(),
 		email: z.string().email("Invalid email address"),
 		password: z
 			.string()

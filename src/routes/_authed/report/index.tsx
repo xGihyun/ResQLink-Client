@@ -106,7 +106,7 @@ function RouteComponent(): JSX.Element {
 	async function handleUploadImage(): Promise<void> {
 		try {
 			const result = await FilePicker.pickImages();
-			if (result.files && result.files.length > 0) {
+			if (result.files.length > 0) {
 				const fileBlob = result.files[0].blob!;
 				const objectUrl = URL.createObjectURL(fileBlob);
 				setPhotoSrc(objectUrl);

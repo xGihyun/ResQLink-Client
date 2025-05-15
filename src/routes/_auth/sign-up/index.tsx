@@ -15,6 +15,7 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
+import { DateField, DateInput } from "@/components/ui/datefield-rac";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,8 @@ import { Button } from "@/components/ui/button";
 import { signUpSchema, SignUpSchema } from "./-schema";
 import { toast } from "sonner";
 import { ApiResponse } from "@/lib/api";
+
+import { parseDate, fromDate } from "@internationalized/date";
 
 export const Route = createFileRoute("/_auth/sign-up/")({
 	component: RouteComponent,
@@ -42,6 +45,7 @@ function RouteComponent() {
 			password: "",
 			confirmPassword: "",
 			hasAcceptedTerms: false,
+			birthDate: new Date().toISOString(),
 		},
 	});
 
@@ -51,25 +55,27 @@ function RouteComponent() {
 	async function onSubmit(value: SignUpSchema) {
 		const toastId = toast.loading("Signing up...");
 
-		const response = await fetch(
-			`${import.meta.env.VITE_BACKEND_URL}/api/sign-up`,
-			{
-				method: "POST",
-				body: JSON.stringify(value),
-				headers: {
-					"Content-Type": "application/json",
-				},
-			},
-		);
-		const result: ApiResponse = await response.json();
-		if (result.code !== 200) {
-			toast.error(result.message, { id: toastId });
-			return;
-		}
+		console.log(value);
 
-		toast.success(result.message, { id: toastId });
-
-		navigate({ to: "/sign-in" });
+		// const response = await fetch(
+		// 	`${import.meta.env.VITE_BACKEND_URL}/api/sign-up`,
+		// 	{
+		// 		method: "POST",
+		// 		body: JSON.stringify(value),
+		// 		headers: {
+		// 			"Content-Type": "application/json",
+		// 		},
+		// 	},
+		// );
+		// const result: ApiResponse = await response.json();
+		// if (result.code !== 200) {
+		// 	toast.error(result.message, { id: toastId });
+		// 	return;
+		// }
+		//
+		// toast.success(result.message, { id: toastId });
+		//
+		// navigate({ to: "/sign-in" });
 	}
 
 	return (
@@ -86,11 +92,7 @@ function RouteComponent() {
 							<FormItem>
 								<FormLabel>First Name</FormLabel>
 								<FormControl>
-									<Input
-										className="min-h-12"
-										placeholder="First Name"
-										{...field}
-									/>
+									<Input className="" placeholder="First Name" {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -104,11 +106,7 @@ function RouteComponent() {
 							<FormItem>
 								<FormLabel>Last Name</FormLabel>
 								<FormControl>
-									<Input
-										className="min-h-12"
-										placeholder="Last Name"
-										{...field}
-									/>
+									<Input className="" placeholder="Last Name" {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -128,11 +126,7 @@ function RouteComponent() {
 											className="absolute left-3 h-5 w-5 text-gray-400"
 											alt="Email Icon"
 										/>
-										<Input
-											placeholder="Email"
-											{...field}
-											className="min-h-12 pl-10"
-										/>
+										<Input placeholder="Email" {...field} className="pl-10" />
 									</div>
 								</FormControl>
 								<FormMessage />
@@ -140,7 +134,25 @@ function RouteComponent() {
 						)}
 					/>
 
-					{/* Password Field with Toggle Visibility */}
+					<FormField
+						control={form.control}
+						name="birthDate"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Birth Date</FormLabel>
+								<FormControl>
+									<Input
+										type="date"
+										{...field}
+										value={field.value.toString()}
+										className="pl-10"
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
 					<FormField
 						control={form.control}
 						name="password"
@@ -161,7 +173,7 @@ function RouteComponent() {
 											placeholder="Password"
 											type={isVisible ? "text" : "password"}
 											{...field}
-											className="min-h-12 pl-10"
+											className="pl-10"
 										/>
 
 										{/* Toggle Visibility Button */}
@@ -205,7 +217,7 @@ function RouteComponent() {
 											placeholder="Confirm Password"
 											type={isVisibleConfirmPass ? "text" : "password"}
 											{...field}
-											className="min-h-12 pl-10"
+											className="pl-10"
 										/>
 
 										{/* Toggle Visibility Button */}
@@ -260,8 +272,8 @@ function RouteComponent() {
 					/>
 				</div>
 
-				<div className="min-h-12 w-full space-y-4">
-					<Button type="submit" className="font-poppins-bold min-h-12 w-full">
+				<div className="w-full space-y-4">
+					<Button type="submit" className="font-poppins-bold w-full">
 						Sign Up
 					</Button>
 
