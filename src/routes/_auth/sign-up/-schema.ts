@@ -1,3 +1,4 @@
+import { UserRole } from "@/lib/user";
 import { z } from "zod";
 
 export const signUpSchema = z
@@ -11,7 +12,8 @@ export const signUpSchema = z
 			.string()
 			.min(2, "Last name must be at least 2 characters")
 			.max(18, "Last name must be at most 18 characters"),
-		birthDate: z.string(),
+		birthDate: z.coerce.date(),
+		role: z.nativeEnum(UserRole),
 		email: z.string().email("Invalid email address"),
 		password: z
 			.string()

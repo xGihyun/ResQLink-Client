@@ -15,7 +15,13 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
-import { DateField, DateInput } from "@/components/ui/datefield-rac";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -25,6 +31,7 @@ import { toast } from "sonner";
 import { ApiResponse } from "@/lib/api";
 
 import { parseDate, fromDate } from "@internationalized/date";
+import { UserRole } from "@/lib/user";
 
 export const Route = createFileRoute("/_auth/sign-up/")({
 	component: RouteComponent,
@@ -45,7 +52,7 @@ function RouteComponent() {
 			password: "",
 			confirmPassword: "",
 			hasAcceptedTerms: false,
-			birthDate: new Date().toISOString(),
+			birthDate: new Date(),
 		},
 	});
 
@@ -57,25 +64,25 @@ function RouteComponent() {
 
 		console.log(value);
 
-		// const response = await fetch(
-		// 	`${import.meta.env.VITE_BACKEND_URL}/api/sign-up`,
-		// 	{
-		// 		method: "POST",
-		// 		body: JSON.stringify(value),
-		// 		headers: {
-		// 			"Content-Type": "application/json",
-		// 		},
-		// 	},
-		// );
-		// const result: ApiResponse = await response.json();
-		// if (result.code !== 200) {
-		// 	toast.error(result.message, { id: toastId });
-		// 	return;
-		// }
-		//
-		// toast.success(result.message, { id: toastId });
-		//
-		// navigate({ to: "/sign-in" });
+		const response = await fetch(
+			`${import.meta.env.VITE_BACKEND_URL}/api/sign-up`,
+			{
+				method: "POST",
+				body: JSON.stringify(value),
+				headers: {
+					"Content-Type": "application/json",
+				},
+			},
+		);
+		const result: ApiResponse = await response.json();
+		if (!response.ok) {
+			toast.error(result.message, { id: toastId });
+			return;
+		}
+
+		toast.success(result.message, { id: toastId });
+
+		navigate({ to: "/sign-in" });
 	}
 
 	return (
@@ -115,20 +122,26 @@ function RouteComponent() {
 
 					<FormField
 						control={form.control}
-						name="email"
+						name="role"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Email</FormLabel>
-								<FormControl>
-									<div className="relative flex w-full items-center">
-										<img
-											src={EmailIcon}
-											className="absolute left-3 h-5 w-5 text-gray-400"
-											alt="Email Icon"
-										/>
-										<Input placeholder="Email" {...field} className="pl-10" />
-									</div>
-								</FormControl>
+								<FormLabel>Role</FormLabel>
+								<Select
+									onValueChange={field.onChange}
+									defaultValue={field.value}
+								>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select a role" />
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										<SelectItem value={UserRole.Citizen}>Citizen</SelectItem>
+										<SelectItem value={UserRole.Responder}>
+											Responder
+										</SelectItem>
+									</SelectContent>
+								</Select>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -147,6 +160,27 @@ function RouteComponent() {
 										value={field.value.toString()}
 										className="pl-10"
 									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						control={form.control}
+						name="email"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Email</FormLabel>
+								<FormControl>
+									<div className="relative flex w-full items-center">
+										<img
+											src={EmailIcon}
+											className="absolute left-3 h-5 w-5 text-gray-400"
+											alt="Email Icon"
+										/>
+										<Input placeholder="Email" {...field} className="pl-10" />
+									</div>
 								</FormControl>
 								<FormMessage />
 							</FormItem>

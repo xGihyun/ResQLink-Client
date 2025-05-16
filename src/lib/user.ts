@@ -1,8 +1,8 @@
 import { ApiResponse } from "./api";
 
 export enum UserRole {
-	Player = "player",
-	Admin = "admin",
+	Citizen = "citizen",
+	Responder = "responder",
 }
 
 export type User = {
