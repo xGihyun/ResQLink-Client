@@ -55,7 +55,7 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 			method: "POST",
 			body: JSON.stringify({
 				token,
-				userId: user.userId,
+				userId: user.id,
 			}),
 			headers: {
 				"Content-Type": "application/json",

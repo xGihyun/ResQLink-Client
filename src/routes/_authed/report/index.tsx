@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { Camera, CameraResultType } from "@capacitor/camera";
 import { FilePicker } from "@capawesome/capacitor-file-picker";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,6 +21,8 @@ import { CitizenStatus } from "./-types";
 import { Label } from "@/components/ui/label";
 import { cn, formatName } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { ApiResponse } from "@/lib/api";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authed/report/")({
 	component: RouteComponent,
@@ -63,28 +64,51 @@ const STATUS_OPTIONS: StatusOption[] = [
 	},
 ];
 
-function RouteComponent(): JSX.Element {
+export function RouteComponent(): JSX.Element {
 	const routeContext = Route.useRouteContext();
-	const [photoSrc, setPhotoSrc] = useState<string | null>(null);
 
 	const form = useForm<ReportSchema>({
 		resolver: zodResolver(reportSchema),
 		defaultValues: {
-			userId: routeContext.user.userId,
 			rawSituation: "",
-			photos: "",
 			name: formatName({
 				firstName: routeContext.user.firstName,
 				middleName: routeContext.user.middleName,
 				lastName: routeContext.user.lastName,
 			}),
+			photos: [],
 		},
 	});
 
-	async function onSubmit(data: ReportSchema): Promise<void> {
-		console.log("Form Data:", data);
+	async function onSubmit(value: ReportSchema): Promise<void> {
+		const formData = new FormData();
+		formData.append("userId", routeContext.user.id);
+		formData.append("name", value.name);
+		formData.append("status", value.status);
+		formData.append("rawSituation", value.rawSituation);
+
+		value.photos.forEach((photo) => {
+			formData.append("photos", photo);
+		});
+
+		console.log(formData);
+
+		const response = await fetch(
+			`${import.meta.env.VITE_BACKEND_URL}/api/reports`,
+			{
+				method: "POST",
+				body: formData,
+			},
+		);
+		const result: ApiResponse = await response.json();
+		if (!response.ok) {
+			toast.error(result.message);
+			return;
+		}
 
 		// TODO: Fetch inference
+
+		toast.success(result.message);
 	}
 
 	async function handleTakePhoto(): Promise<void> {
@@ -93,11 +117,21 @@ function RouteComponent(): JSX.Element {
 				quality: 90,
 				resultType: CameraResultType.Uri,
 			});
-			const photoUrl = photo.webPath || null;
-			setPhotoSrc(photoUrl);
-			if (photoUrl) {
-				form.setValue("photos", photoUrl);
+
+			if (!photo.webPath) {
+				console.warn("No webPath taken for the photo");
+				return;
 			}
+
+			const response = await fetch(photo.webPath);
+			const blob = await response.blob();
+
+			const fileName = `photo_${new Date().getTime()}.${photo.format}`;
+			const file = new File([blob], fileName, { type: blob.type });
+
+			const photos = form.getValues().photos;
+			photos.push(file);
+			form.setValue("photos", photos);
 		} catch (error) {
 			console.error("Error taking photo:", error);
 		}
@@ -106,12 +140,23 @@ function RouteComponent(): JSX.Element {
 	async function handleUploadImage(): Promise<void> {
 		try {
 			const result = await FilePicker.pickImages();
-			if (result.files.length > 0) {
-				const fileBlob = result.files[0].blob!;
-				const objectUrl = URL.createObjectURL(fileBlob);
-				setPhotoSrc(objectUrl);
-				form.setValue("photos", fileBlob);
+			if (result.files.length < 1) {
+				return;
 			}
+
+			const photos = form.getValues().photos;
+
+			result.files.forEach((file) => {
+				if (!file.blob) {
+					console.warn("File blob not found");
+					return;
+				}
+
+				const f = new File([file.blob], file.name);
+				photos.push(f);
+			});
+
+			form.setValue("photos", photos);
 		} catch (error) {
 			console.error("Error picking file:", error);
 		}
@@ -128,13 +173,16 @@ function RouteComponent(): JSX.Element {
 
 			<Form {...form}>
 				<form
-					onSubmit={form.handleSubmit(onSubmit)}
+					onSubmit={form.handleSubmit(onSubmit, (errors) =>
+						console.error(errors),
+					)}
 					className="w-full space-y-4"
+					encType="multipart/form-data"
 				>
 					<FormField
 						control={form.control}
 						name="status"
-						render={({ field, fieldState }) => (
+						render={({ field }) => (
 							<FormItem>
 								<FormLabel className="font-playfair-display-semibold text-base">
 									How are You?
@@ -181,7 +229,7 @@ function RouteComponent(): JSX.Element {
 										))}
 									</RadioGroup>
 								</FormControl>
-								<FormMessage>{fieldState.error?.message}</FormMessage>
+								<FormMessage />
 							</FormItem>
 						)}
 					/>
@@ -189,15 +237,15 @@ function RouteComponent(): JSX.Element {
 					<FormField
 						control={form.control}
 						name="rawSituation"
-						render={({ field, fieldState }) => (
+						render={({ field }) => (
 							<FormItem className="w-full">
 								<FormLabel className="font-playfair-display-semibold text-base">
 									Describe Your Situation
 								</FormLabel>
 								<FormControl>
-									<Textarea {...field} className="text-base" />
+									<Textarea {...field} />
 								</FormControl>
-								<FormMessage>{fieldState.error?.message}</FormMessage>
+								<FormMessage />
 							</FormItem>
 						)}
 					/>
@@ -207,10 +255,15 @@ function RouteComponent(): JSX.Element {
 							Add Photo Evidence
 						</div>
 						<div className="flex w-full flex-col gap-2">
-							<Button onClick={handleTakePhoto} size="lg">
+							<Button type="button" onClick={handleTakePhoto} size="lg">
 								Take Photo
 							</Button>
-							<Button onClick={handleUploadImage} size="lg" variant="secondary">
+							<Button
+								type="button"
+								onClick={handleUploadImage}
+								size="lg"
+								variant="secondary"
+							>
 								Upload Image
 							</Button>
 						</div>
@@ -218,9 +271,9 @@ function RouteComponent(): JSX.Element {
 						<FormField
 							control={form.control}
 							name="photos"
-							render={({ fieldState }) => (
+							render={() => (
 								<FormItem>
-									<FormMessage>{fieldState.error?.message}</FormMessage>
+									<FormMessage />
 								</FormItem>
 							)}
 						/>
@@ -234,5 +287,3 @@ function RouteComponent(): JSX.Element {
 		</div>
 	);
 }
-
-export default RouteComponent;

@@ -6,7 +6,7 @@ export enum UserRole {
 }
 
 export type User = {
-	userId: string;
+	id: string;
 	createdAt: string;
 	updatedAt: string;
 	email: string;
@@ -20,7 +20,7 @@ export type User = {
 };
 
 type Session = {
-	sessionId: string;
+	id: string;
 	userId: string;
 	expiresAt: string;
 };
