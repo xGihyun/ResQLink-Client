@@ -29,7 +29,7 @@ function RouteComponent() {
 	const loaderData = Route.useLoaderData();
 
 	const mapContainerRef = useRef<HTMLDivElement | null>(null);
-	const [mapInstance, setMapInstance] = useState<GoogleMap | null>(null);
+	const mapRef = useRef<GoogleMap | null>(null);
 
 	async function createMap(): Promise<void> {
 		if (!mapContainerRef.current) return;
@@ -47,28 +47,24 @@ function RouteComponent() {
 					zoom: 2,
 				},
 			});
-			setMapInstance(googleMap);
 
-			if (!mapInstance) {
-                console.warn("Map instance not found")
-				return;
-			}
+			mapRef.current = googleMap;
 
-			await mapInstance.enableCurrentLocation(true);
+			await googleMap.enableCurrentLocation(true);
 
 			if (Capacitor.getPlatform() === "android") {
 				const position = await Geolocation.getCurrentPosition();
 				const lat = position.coords.latitude;
 				const long = position.coords.longitude;
 
-				await mapInstance.addMarker({
+				await googleMap.addMarker({
 					coordinate: {
 						lat: lat,
 						lng: long,
 					},
 				});
 
-				await mapInstance.setCamera({
+				await googleMap.setCamera({
 					coordinate: {
 						lat: lat,
 						lng: long,
@@ -81,7 +77,7 @@ function RouteComponent() {
 					continue;
 				}
 
-				await mapInstance.addMarkers([
+				await googleMap.addMarkers([
 					{
 						coordinate: {
 							lat: report.location.latitude,
@@ -96,11 +92,7 @@ function RouteComponent() {
 	}
 
 	useEffect(() => {
-		async function init(): Promise<void> {
-			await createMap();
-		}
-
-		init();
+		createMap();
 	}, []);
 
 	return (
@@ -112,7 +104,9 @@ function RouteComponent() {
 
 				<div className="divide-foreground/10 divide-y overflow-y-scroll">
 					{loaderData.reports.map((report) => {
-						return <PriorityItem report={report} map={mapInstance} key={report.id} />;
+						return (
+							<PriorityItem report={report} map={mapRef.current} key={report.id} />
+						);
 					})}
 				</div>
 			</div>
