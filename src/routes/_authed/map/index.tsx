@@ -30,6 +30,7 @@ function RouteComponent() {
 
 	const mapContainerRef = useRef<HTMLDivElement | null>(null);
 	const mapRef = useRef<GoogleMap | null>(null);
+	const [mapInstance, setMapInstance] = useState<GoogleMap | null>(null);
 
 	async function createMap(): Promise<void> {
 		if (!mapContainerRef.current) return;
@@ -49,6 +50,7 @@ function RouteComponent() {
 			});
 
 			mapRef.current = googleMap;
+			setMapInstance(googleMap);
 
 			await googleMap.enableCurrentLocation(true);
 
@@ -105,7 +107,7 @@ function RouteComponent() {
 				<div className="divide-foreground/10 divide-y overflow-y-scroll">
 					{loaderData.reports.map((report) => {
 						return (
-							<PriorityItem report={report} map={mapRef.current} key={report.id} />
+							<PriorityItem report={report} map={mapInstance} key={report.id} />
 						);
 					})}
 				</div>
