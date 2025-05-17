@@ -64,7 +64,7 @@ const STATUS_OPTIONS: StatusOption[] = [
 	},
 ];
 
-export function RouteComponent(): JSX.Element {
+function RouteComponent(): JSX.Element {
 	const routeContext = Route.useRouteContext();
 
 	const form = useForm<ReportSchema>({
@@ -109,6 +109,8 @@ export function RouteComponent(): JSX.Element {
 		// TODO: Fetch inference
 
 		toast.success(result.message);
+
+        // TODO: Track user's location
 	}
 
 	async function handleTakePhoto(): Promise<void> {
