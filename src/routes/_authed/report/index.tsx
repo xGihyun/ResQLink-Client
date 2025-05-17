@@ -17,12 +17,12 @@ import { reportSchema, ReportSchema } from "./-schema";
 import { JSX } from "react";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { StatusItem } from "./-components/status-item";
-import { CitizenStatus } from "./-types";
 import { Label } from "@/components/ui/label";
 import { cn, formatName } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ApiResponse } from "@/lib/api";
 import { toast } from "sonner";
+import { CitizenStatus } from "@/lib/report";
 
 export const Route = createFileRoute("/_authed/report/")({
 	component: RouteComponent,

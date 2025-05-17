@@ -3,145 +3,118 @@ import { useEffect, useRef, useState } from "react";
 import { GoogleMap } from "@capacitor/google-maps";
 import { Geolocation } from "@capacitor/geolocation";
 import { Capacitor } from "@capacitor/core";
+import { ApiResponse } from "@/lib/api";
+import { BasicReport } from "@/lib/report";
+import { PriorityItem } from "./-components/priority-item";
 
 export const Route = createFileRoute("/_authed/map/")({
 	component: RouteComponent,
+	loader: async () => {
+		const response = await fetch(
+			`${import.meta.env.VITE_BACKEND_URL}/api/reports`,
+			{
+				method: "GET",
+			},
+		);
+		const result: ApiResponse<BasicReport[]> = await response.json();
+		if (!response.ok) {
+			throw new Error(result.message);
+		}
+
+		return { reports: result.data };
+	},
 });
 
-type Victim = {
-	victim_report_id: string;
-	created_at: string;
-	ai_gen_situation?: string;
-	status: string;
-	photo_evidence_url?: string;
-	responded_at?: string;
-	user_near?: string;
-	lat?: number;
-	long?: number;
-	is_distressed?: boolean;
-	user_id: string;
-	users: {
-		first_name: string;
-		last_name: string;
-	};
-};
-
 function RouteComponent() {
-	const mapRef = useRef<HTMLDivElement | null>(null);
-	let newMap: GoogleMap;
-	//
-	//async function createMap() {
-	//	if (!mapRef.current) return;
-	//
-	//	try {
-	//		newMap = await GoogleMap.create({
-	//			id: "map",
-	//			element: mapRef.current,
-	//			apiKey: "",
-	//			config: {
-	//				center: {
-	//					lat: 33.6,
-	//					lng: -117.9,
-	//				},
-	//				zoom: 2,
-	//			},
-	//		});
-	//		await newMap.enableCurrentLocation(true);
-	//
-	//		if (Capacitor.getPlatform() == "android") {
-	//			const position = await Geolocation.getCurrentPosition();
-	//			const lat = position.coords.latitude;
-	//			const long = position.coords.longitude;
-	//
-	//			await newMap.addMarker({
-	//				coordinate: {
-	//					lat: lat,
-	//					lng: long,
-	//				},
-	//			});
-	//
-	//			await newMap.setCamera({
-	//				coordinate: {
-	//					lat: lat,
-	//					lng: long,
-	//				},
-	//			});
-	//		}
-	//	} catch (error) {}
-	//}
-	//
-	//const [priorities, setPriorities] = useState<Victim[]>([]);
-	//
-	//useEffect(() => {
-	//	const foo = async () => {
-	//		await createMap();
-	//
-	//		const getVictims = async () => {
-	//			const victims = await supabase
-	//				.from("victim_reports")
-	//				.select(`*, users (first_name, last_name)`)
-	//				.is("responded_at", null);
-	//
-	//			setPriorities((victims.data as Victim[]) || []);
-	//
-	//			for (const priority of victims.data!) {
-	//				if (priority.lat === null || priority.long === null) {
-	//					return;
-	//				}
-	//
-	//				await newMap.addMarkers([
-	//					{
-	//						coordinate: {
-	//							lat: priority.lat,
-	//							lng: priority.long,
-	//						},
-	//					},
-	//				]);
-	//			}
-	//		};
-	//
-	//		await getVictims();
-	//	};
-	//
-	//	foo();
-	//}, []);
+	const loaderData = Route.useLoaderData();
+
+	const mapContainerRef = useRef<HTMLDivElement | null>(null);
+	const [mapInstance, setMapInstance] = useState<GoogleMap | null>(null);
+
+	async function createMap(): Promise<void> {
+		if (!mapContainerRef.current) return;
+
+		try {
+			const googleMap = await GoogleMap.create({
+				id: "map",
+				element: mapContainerRef.current,
+				apiKey: import.meta.env.VITE_GOOGLE_MAPS_API,
+				config: {
+					center: {
+						lat: 33.6,
+						lng: -117.9,
+					},
+					zoom: 2,
+				},
+			});
+			setMapInstance(googleMap);
+
+			if (!mapInstance) {
+                console.warn("Map instance not found")
+				return;
+			}
+
+			await mapInstance.enableCurrentLocation(true);
+
+			if (Capacitor.getPlatform() === "android") {
+				const position = await Geolocation.getCurrentPosition();
+				const lat = position.coords.latitude;
+				const long = position.coords.longitude;
+
+				await mapInstance.addMarker({
+					coordinate: {
+						lat: lat,
+						lng: long,
+					},
+				});
+
+				await mapInstance.setCamera({
+					coordinate: {
+						lat: lat,
+						lng: long,
+					},
+				});
+			}
+
+			for (const report of loaderData.reports) {
+				if (!report.location) {
+					continue;
+				}
+
+				await mapInstance.addMarkers([
+					{
+						coordinate: {
+							lat: report.location.latitude,
+							lng: report.location.longitude,
+						},
+					},
+				]);
+			}
+		} catch (error) {
+			console.error("Failed to create map:", error);
+		}
+	}
+
+	useEffect(() => {
+		async function init(): Promise<void> {
+			await createMap();
+		}
+
+		init();
+	}, []);
 
 	return (
-		<div className="w-full h-screen">
-			<div ref={mapRef} className="w-full h-[70%] z-0" id="map"></div>
-			<div className="flex flex-col items-center justify-center z-20 h-fit bg-white p-6 *:w-full *:max-w-md">
-				<div className="flex flex-row justify-between items-center">
-					<span className="font-bold my-2">Highest Priorities</span>
-					<span className="text-xs text-gray-400 underline my-2">
-						View More
-					</span>
+		<div className="h-full w-full">
+			<div ref={mapContainerRef} className="z-0 h-3/5 w-full" id="map"></div>
+
+			<div className="p-6">
+				<h1 className="font-playfair-display-bold mb-4">Highest Priorities</h1>
+
+				<div className="divide-foreground/10 divide-y overflow-y-scroll">
+					{loaderData.reports.map((report) => {
+						return <PriorityItem report={report} map={mapInstance} key={report.id} />;
+					})}
 				</div>
-
-				<div className="h-32 overflow-y-scroll">
-				</div>
-			</div>
-		</div>
-	);
-}
-
-type PriorityItemProps = {
-	priority: Victim;
-};
-
-function PriorityItem(props: PriorityItemProps) {
-	return (
-		<div className="flex flex-row items-center gap-4 border-b-[1px] border-black py-2">
-			<span className="text-xs bg-red-400 p-2 px-4 text-white rounded-xl h-full">
-				{props.priority.status}
-			</span>
-
-			<div className="flex-1 flex flex-row justify-between items-center">
-				<span className="text-xs">
-					{props.priority.users.first_name} {props.priority.users.last_name}
-				</span>
-				<span className="text-xs text-gray-400">
-					{props.priority.created_at}
-				</span>
 			</div>
 		</div>
 	);

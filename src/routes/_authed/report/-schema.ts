@@ -1,5 +1,5 @@
+import { CitizenStatus } from "@/lib/report";
 import { z } from "zod";
-import { CitizenStatus } from "./-types";
 
 export const reportSchema = z.object({
 	status: z.nativeEnum(CitizenStatus, {

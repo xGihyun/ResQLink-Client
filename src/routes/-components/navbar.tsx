@@ -5,7 +5,7 @@ export function Navbar(): JSX.Element {
 	const location = useLocation();
 
 	return (
-		<nav className="w-full h-20 fixed bottom-0 left-0 bg-background px-5 content-center">
+		<nav className="w-full h-20 fixed bottom-0 left-0 px-5 content-center bg-white shadow">
 			<div className="w-full flex items-center justify-center gap-10">
 				<Link to="/report" className={`${location.href === '/report' ? 'text-primary' : 'text-foreground'}`}>
 					<svg
