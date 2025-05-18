@@ -6,7 +6,7 @@ export const Route = createFileRoute("/_auth")({
 	beforeLoad: async ({ context }) => {
 		const userSession = await context.auth.validateSession();
 		if (userSession !== null) {
-			throw redirect({ to: "/dashboard" });
+			throw redirect({ to: "/report" });
 		}
 	},
 });
