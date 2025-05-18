@@ -20,7 +20,7 @@ function RootComponent() {
 			<Outlet />
 			<Toaster richColors closeButton theme="light" position="top-right" />
 
-			<TanStackRouterDevtools position="bottom-right" />
+			{/* <TanStackRouterDevtools position="bottom-right" /> */}
 		</>
 	);
 }

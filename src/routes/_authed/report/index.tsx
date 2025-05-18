@@ -18,7 +18,7 @@ import { JSX } from "react";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { StatusItem } from "./-components/status-item";
 import { Label } from "@/components/ui/label";
-import { cn, formatName, serializeFormDataToBase64 } from "@/lib/utils";
+import { cn, fileToBase64, formatName } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ApiResponse } from "@/lib/api";
 import { toast } from "sonner";
@@ -92,18 +92,12 @@ function RouteComponent(): JSX.Element {
 			formData.append("photos", photo);
 		});
 
-        const serializedFormData = await serializeFormDataToBase64(formData)
-
 		console.log(formData);
-		console.log(serializedFormData);
 
 		const response = await CapacitorHttp.post({
 			url: `${import.meta.env.VITE_BACKEND_URL}/api/reports`,
-			data: serializedFormData,
+			data: formData,
 			dataType: "formData",
-			headers: {
-				"Content-Type": "multipart/form-data",
-			},
 		});
 		const result: ApiResponse = response.data;
 		if (response.status !== 201) {
@@ -180,127 +174,133 @@ function RouteComponent(): JSX.Element {
 	}
 
 	return (
-		<div className="mx-auto flex h-screen w-full max-w-md min-w-[300px] flex-col items-center justify-start gap-6 p-4">
-			<div className="flex w-full flex-col gap-3">
-				<div className="font-playfair-display-black text-primary text-2xl">
-					Emergency Status Update
+		<div className="bg-background h-svh w-full max-w-3xl">
+			<div className="mx-auto flex h-full w-full max-w-md min-w-[300px] flex-col items-center justify-start gap-6 p-4">
+				<div className="flex w-full flex-col gap-3">
+					<div className="font-playfair-display-black text-primary text-2xl">
+						Emergency Status Update
+					</div>
+					<hr className="border-primary border" />
 				</div>
-				<hr className="border-primary border" />
-			</div>
 
-			<Form {...form}>
-				<form
-					onSubmit={form.handleSubmit(onSubmit, (errors) =>
-						console.error(errors),
-					)}
-					className="w-full space-y-4"
-					encType="multipart/form-data"
-				>
-					<FormField
-						control={form.control}
-						name="status"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel className="font-playfair-display-semibold text-base">
-									How are You?
-								</FormLabel>
-
-								<FormControl>
-									<RadioGroup
-										className="gap-2"
-										onValueChange={field.onChange}
-										defaultValue={field.value}
-									>
-										{STATUS_OPTIONS.map((statusOption) => (
-											<FormItem key={statusOption.value}>
-												<FormControl>
-													<div
-														className={cn(
-															"border-input has-data-[state=checked]:border-ring text-background relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none",
-															statusOption.class,
-														)}
-													>
-														<StatusItem
-															id={statusOption.value}
-															value={statusOption.value}
-															className="order-1 after:absolute after:inset-0"
-														/>
-
-														<div className="flex grow items-center gap-3">
-															{statusOption.icon}
-															<div className="grid grow gap-0">
-																<Label
-																	htmlFor={statusOption.value}
-																	className="font-playfair-display-black text-xl"
-																>
-																	{statusOption.label}
-																</Label>
-																<p className="text-xs">
-																	{statusOption.description}
-																</p>
-															</div>
-														</div>
-													</div>
-												</FormControl>
-											</FormItem>
-										))}
-									</RadioGroup>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
+				<Form {...form}>
+					<form
+						onSubmit={form.handleSubmit(onSubmit, (errors) =>
+							console.error(errors),
 						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name="rawSituation"
-						render={({ field }) => (
-							<FormItem className="w-full">
-								<FormLabel className="font-playfair-display-semibold text-base">
-									Describe Your Situation
-								</FormLabel>
-								<FormControl>
-									<Textarea {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<div className="flex w-full flex-col gap-3">
-						<div className="font-playfair-display-semibold text-base">
-							Add Photo Evidence
-						</div>
-						<div className="flex w-full flex-col gap-2">
-							<Button type="button" onClick={handleTakePhoto} size="lg">
-								Take Photo
-							</Button>
-							<Button
-								type="button"
-								onClick={handleUploadImage}
-								size="lg"
-								variant="secondary"
-							>
-								Upload Image
-							</Button>
-						</div>
-
+						className="w-full space-y-4"
+						encType="multipart/form-data"
+					>
 						<FormField
 							control={form.control}
-							name="photos"
-							render={() => (
+							name="status"
+							render={({ field }) => (
 								<FormItem>
+									<FormLabel className="font-playfair-display-semibold text-base">
+										How are You?
+									</FormLabel>
+
+									<FormControl>
+										<RadioGroup
+											className="gap-2"
+											onValueChange={field.onChange}
+											defaultValue={field.value}
+										>
+											{STATUS_OPTIONS.map((statusOption) => (
+												<FormItem key={statusOption.value}>
+													<FormControl>
+														<div
+															className={cn(
+																"border-input has-data-[state=checked]:border-ring text-background relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none",
+																statusOption.class,
+															)}
+														>
+															<StatusItem
+																id={statusOption.value}
+																value={statusOption.value}
+																className="order-1 after:absolute after:inset-0"
+															/>
+
+															<div className="flex grow items-center gap-3">
+																{statusOption.icon}
+																<div className="grid grow gap-0">
+																	<Label
+																		htmlFor={statusOption.value}
+																		className="font-playfair-display-black text-xl"
+																	>
+																		{statusOption.label}
+																	</Label>
+																	<p className="text-xs">
+																		{statusOption.description}
+																	</p>
+																</div>
+															</div>
+														</div>
+													</FormControl>
+												</FormItem>
+											))}
+										</RadioGroup>
+									</FormControl>
 									<FormMessage />
 								</FormItem>
 							)}
 						/>
-					</div>
 
-					<Button type="submit" size="lg" className="font-poppins-bold w-full">
-						Submit
-					</Button>
-				</form>
-			</Form>
+						<FormField
+							control={form.control}
+							name="rawSituation"
+							render={({ field }) => (
+								<FormItem className="w-full">
+									<FormLabel className="font-playfair-display-semibold text-base">
+										Describe Your Situation
+									</FormLabel>
+									<FormControl>
+										<Textarea {...field} />
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<div className="flex w-full flex-col gap-3">
+							<div className="font-playfair-display-semibold text-base">
+								Add Photo Evidence
+							</div>
+							<div className="flex w-full flex-col gap-2">
+								<Button type="button" onClick={handleTakePhoto} size="lg">
+									Take Photo
+								</Button>
+								<Button
+									type="button"
+									onClick={handleUploadImage}
+									size="lg"
+									variant="secondary"
+								>
+									Upload Image
+								</Button>
+							</div>
+
+							<FormField
+								control={form.control}
+								name="photos"
+								render={() => (
+									<FormItem>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+
+						<Button
+							type="submit"
+							size="lg"
+							className="font-poppins-bold w-full"
+						>
+							Submit
+						</Button>
+					</form>
+				</Form>
+			</div>
 		</div>
 	);
 }

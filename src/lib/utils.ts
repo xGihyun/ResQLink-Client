@@ -15,10 +15,10 @@ export function formatName(name: FullName): string {
 	return `${name.lastName}, ${name.firstName}${name.middleName ? " " + name.middleName : ""}`;
 }
 
-function fileToBase64(file: File) {
+export function fileToBase64(file: File): Promise<string> {
 	return new Promise((resolve, reject) => {
 		const reader = new FileReader();
-		reader.onload = () => resolve(reader.result); // This will be a Data URL (e.g., "data:image/png;base64,...")
+		reader.onload = () => resolve(reader.result as string); // This will be a Data URL (e.g., "data:image/png;base64,...")
 		reader.onerror = reject;
 		reader.readAsDataURL(file);
 	});

@@ -144,23 +144,23 @@
 		@apply border-border outline-ring/50;
 	}
 	body {
-		@apply bg-background text-foreground;
+		/* @apply bg-background text-foreground; */
 		font-family: "Poppins", sans-serif;
 	}
 }
 
-app-home,
-ion-content {
-	background: none;
-	--background: none;
-}
+/* app-home, */
+/* ion-content { */
+/* 	background: none; */
+/* 	--background: none; */
+/* } */
 
 ion-content {
 	--background: transparent;
 }
 
 body {
-	background: #f0f9f7;
+	background: transparent;
 }
 
 capacitor-google-map {

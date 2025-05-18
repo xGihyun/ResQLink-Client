@@ -141,13 +141,20 @@ function RouteComponent() {
 
 	useEffect(() => {
 		createMap();
+
+		return () => {
+			if (mapRef.current) {
+				mapRef.current.destroy();
+				setMapInstance(null);
+			}
+		};
 	}, []);
 
 	return (
 		<div className="h-full w-full">
 			<div ref={mapContainerRef} className="z-0 h-3/5 w-full" id="map"></div>
 
-			<div className="p-6">
+			<div className="bg-background p-6">
 				<h1 className="font-playfair-display-bold mb-4">Highest Priorities</h1>
 
 				<div className="divide-foreground/10 divide-y overflow-y-scroll">
