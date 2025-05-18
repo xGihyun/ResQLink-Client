@@ -18,11 +18,12 @@ import { JSX } from "react";
 import { RadioGroup } from "@/components/ui/radio-group";
 import { StatusItem } from "./-components/status-item";
 import { Label } from "@/components/ui/label";
-import { cn, formatName } from "@/lib/utils";
+import { cn, formatName, serializeFormDataToBase64 } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ApiResponse } from "@/lib/api";
 import { toast } from "sonner";
 import { CitizenStatus } from "@/lib/report";
+import { CapacitorHttp } from "@capacitor/core";
 
 export const Route = createFileRoute("/_authed/report/")({
 	component: RouteComponent,
@@ -91,17 +92,21 @@ function RouteComponent(): JSX.Element {
 			formData.append("photos", photo);
 		});
 
-		console.log(formData);
+        const serializedFormData = await serializeFormDataToBase64(formData)
 
-		const response = await fetch(
-			`${import.meta.env.VITE_BACKEND_URL}/api/reports`,
-			{
-				method: "POST",
-				body: formData,
+		console.log(formData);
+		console.log(serializedFormData);
+
+		const response = await CapacitorHttp.post({
+			url: `${import.meta.env.VITE_BACKEND_URL}/api/reports`,
+			data: serializedFormData,
+			dataType: "formData",
+			headers: {
+				"Content-Type": "multipart/form-data",
 			},
-		);
-		const result: ApiResponse = await response.json();
-		if (!response.ok) {
+		});
+		const result: ApiResponse = response.data;
+		if (response.status !== 201) {
 			toast.error(result.message);
 			return;
 		}
@@ -110,7 +115,7 @@ function RouteComponent(): JSX.Element {
 
 		toast.success(result.message);
 
-        // TODO: Track user's location
+		// TODO: Track user's location
 	}
 
 	async function handleTakePhoto(): Promise<void> {
@@ -125,8 +130,18 @@ function RouteComponent(): JSX.Element {
 				return;
 			}
 
-			const response = await fetch(photo.webPath);
-			const blob = await response.blob();
+			const response = await CapacitorHttp.get({ url: photo.webPath });
+			const binaryData = atob(response.data);
+			const bytes = new Uint8Array(binaryData.length);
+
+			for (let i = 0; i < binaryData.length; i++) {
+				bytes[i] = binaryData.charCodeAt(i);
+			}
+
+			const blob = new Blob([bytes], {
+				type: response.headers["content-type"] || "application/octet-stream",
+			});
+			// const blob = await response.blob();
 
 			const fileName = `photo_${new Date().getTime()}.${photo.format}`;
 			const file = new File([blob], fileName, { type: blob.type });

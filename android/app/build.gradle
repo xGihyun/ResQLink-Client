@@ -1,18 +1,10 @@
 apply plugin: 'com.android.application'
 
-plugins {
-  id 'com.android.application'
-
-  // Add the Google services Gradle plugin
-  id 'com.google.gms.google-services'
-  // ...
-}
-
 android {
-    namespace "com.example.app"
+    namespace "com.ipv.resqlink"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.example.app"
+        applicationId "com.ipv.resqlink"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -35,7 +27,6 @@ android {
 repositories {
     flatDir{
         dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
-        dirs '../../node_modules/@capacitor/background-runner/android/src/main/libs', 'libs'
     }
 }
 

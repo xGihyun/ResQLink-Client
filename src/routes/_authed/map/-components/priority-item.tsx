@@ -58,7 +58,7 @@ export function PriorityItem(props: PriorityItemProps): JSX.Element {
 				lat: props.report.location.latitude,
 				lng: props.report.location.longitude,
 			},
-			zoom: 5,
+			zoom: 10,
 		});
 	}
 

@@ -32,6 +32,7 @@ import { ApiResponse } from "@/lib/api";
 
 import { parseDate, fromDate } from "@internationalized/date";
 import { UserRole } from "@/lib/user";
+import { CapacitorHttp } from "@capacitor/core";
 
 export const Route = createFileRoute("/_auth/sign-up/")({
 	component: RouteComponent,
@@ -64,18 +65,15 @@ function RouteComponent() {
 
 		console.log(value);
 
-		const response = await fetch(
-			`${import.meta.env.VITE_BACKEND_URL}/api/sign-up`,
-			{
-				method: "POST",
-				body: JSON.stringify(value),
-				headers: {
-					"Content-Type": "application/json",
-				},
+		const response = await CapacitorHttp.post({
+			url: `${import.meta.env.VITE_BACKEND_URL}/api/sign-up`,
+			data: value,
+			headers: {
+				"Content-Type": "application/json",
 			},
-		);
-		const result: ApiResponse = await response.json();
-		if (!response.ok) {
+		});
+		const result: ApiResponse = response.data;
+		if (response.status !== 201) {
 			toast.error(result.message, { id: toastId });
 			return;
 		}

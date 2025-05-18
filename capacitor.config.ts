@@ -4,22 +4,21 @@ const config: CapacitorConfig = {
 	appId: "com.ipv.resqlink",
 	appName: "resqlink",
 	webDir: "dist",
+	android: {
+		buildOptions: {
+			releaseType: "APK",
+			keystorePath: "/home/gihyun/.android/debug.keystore",
+			keystorePassword: "android",
+			keystoreAlias: "androiddebugkey",
+			keystoreAliasPassword: "android",
+		},
+	},
+	server: {
+		androidScheme: "http",
+	},
 	plugins: {
-		BackgroundRunner: {
-			label: "com.ipv.background.task",
-			src: "runners/runner.sms.ts",
-			event: "listenToSms",
-			repeat: true,
-			interval: 15,
-			autoStart: true,
-		},
-		PushNotifications: {
-			presentationOptions: ["badge", "sound", "alert"],
-		},
-		LocalNotifications: {
-			smallIcon: "ic_stat_icon_config_sample",
-			iconColor: "#488AFF",
-			sound: "beep.wav",
+		CapacitorHttp: {
+			enabled: true,
 		},
 	},
 };

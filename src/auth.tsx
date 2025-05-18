@@ -8,6 +8,7 @@ import {
 	SignInAnonymousRequest,
 	SignInAnonymousResponse,
 } from "./routes/_auth/sign-in/anonymous/-types";
+import { CapacitorHttp } from "@capacitor/core";
 
 export type AuthContextValue = {
 	validateSession: () => Promise<UserSession | null>;
@@ -51,12 +52,12 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 			return;
 		}
 
-		await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/sign-out`, {
-			method: "POST",
-			body: JSON.stringify({
+		await CapacitorHttp.post({
+			url: `${import.meta.env.VITE_BACKEND_URL}/api/sign-out`,
+			data: {
 				token,
 				userId: user.id,
-			}),
+			},
 			headers: {
 				"Content-Type": "application/json",
 			},
@@ -69,17 +70,14 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 	async function signIn(
 		value: SignInRequest,
 	): Promise<ApiResponse<SignInResponse>> {
-		const response = await fetch(
-			`${import.meta.env.VITE_BACKEND_URL}/api/sign-in`,
-			{
-				method: "POST",
-				body: JSON.stringify(value),
-				headers: {
-					"Content-Type": "application/json",
-				},
+		const response = await CapacitorHttp.post({
+			url: `${import.meta.env.VITE_BACKEND_URL}/api/sign-in`,
+			data: value,
+			headers: {
+				"Content-Type": "application/json",
 			},
-		);
-		const result: ApiResponse<SignInResponse> = await response.json();
+		});
+		const result: ApiResponse<SignInResponse> = response.data;
 
 		setCookie("session", result.data.token);
 
@@ -94,18 +92,14 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 			anonymousId: id,
 		};
 
-		const response = await fetch(
-			`${import.meta.env.VITE_BACKEND_URL}/api/sign-in/anonymous`,
-			{
-				method: "POST",
-				body: JSON.stringify(request),
-				headers: {
-					"Content-Type": "application/json",
-				},
+		const response = await CapacitorHttp.post({
+			url: `${import.meta.env.VITE_BACKEND_URL}/api/sign-in/anonymous`,
+			data: request,
+			headers: {
+				"Content-Type": "application/json",
 			},
-		);
-		const result: ApiResponse<SignInAnonymousResponse> = await response.json();
-
+		});
+		const result: ApiResponse<SignInAnonymousResponse> = response.data;
 		// TODO: Store `anonymousId` and `value` locally
 
 		setCookie("session", result.data.token);

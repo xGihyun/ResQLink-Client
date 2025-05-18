@@ -2,22 +2,26 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { GoogleMap } from "@capacitor/google-maps";
 import { Geolocation } from "@capacitor/geolocation";
-import { Capacitor } from "@capacitor/core";
+import { Capacitor, CapacitorHttp } from "@capacitor/core";
 import { ApiResponse } from "@/lib/api";
-import { BasicReport } from "@/lib/report";
+import { BasicReport, SaveLocationRequest } from "@/lib/report";
 import { PriorityItem } from "./-components/priority-item";
+import useWebSocket from "react-use-websocket";
+import {
+	WEBSOCKET_OPTIONS,
+	WEBSOCKET_URL,
+	WebSocketEvent,
+	WebSocketMessage,
+} from "@/lib/websocket";
 
 export const Route = createFileRoute("/_authed/map/")({
 	component: RouteComponent,
 	loader: async () => {
-		const response = await fetch(
-			`${import.meta.env.VITE_BACKEND_URL}/api/reports`,
-			{
-				method: "GET",
-			},
-		);
-		const result: ApiResponse<BasicReport[]> = await response.json();
-		if (!response.ok) {
+		const response = await CapacitorHttp.get({
+			url: `${import.meta.env.VITE_BACKEND_URL}/api/reports`,
+		});
+		const result: ApiResponse<BasicReport[]> = response.data;
+		if (response.status !== 200) {
 			throw new Error(result.message);
 		}
 
@@ -27,10 +31,52 @@ export const Route = createFileRoute("/_authed/map/")({
 
 function RouteComponent() {
 	const loaderData = Route.useLoaderData();
+	const [reports, setReports] = useState<BasicReport[]>(loaderData.reports);
 
 	const mapContainerRef = useRef<HTMLDivElement | null>(null);
 	const mapRef = useRef<GoogleMap | null>(null);
 	const [mapInstance, setMapInstance] = useState<GoogleMap | null>(null);
+	const markerMap = useRef<Map<string, string>>(new Map());
+
+	const socket = useWebSocket(WEBSOCKET_URL, {
+		...WEBSOCKET_OPTIONS,
+		share: true,
+		async onMessage(event) {
+			const result: WebSocketMessage = JSON.parse(event.data);
+
+			console.log(result);
+
+			switch (result.event) {
+				case WebSocketEvent.SaveLocation:
+					const data = result.data as SaveLocationRequest;
+
+					setReports((prev) =>
+						prev.map((report) =>
+							report.reporter.id === data.reporterId
+								? { ...report, location: data.location }
+								: report,
+						),
+					);
+
+					const markerId = markerMap.current.get(data.reporterId);
+					if (!markerId || !mapRef.current) {
+						break;
+					}
+
+					await mapRef.current.removeMarker(markerId);
+
+					const newMarkerId = await mapRef.current.addMarker({
+						coordinate: {
+							lat: data.location.latitude,
+							lng: data.location.longitude,
+						},
+					});
+
+					markerMap.current.set(data.reporterId, newMarkerId);
+					break;
+			}
+		},
+	});
 
 	async function createMap(): Promise<void> {
 		if (!mapContainerRef.current) return;
@@ -79,14 +125,14 @@ function RouteComponent() {
 					continue;
 				}
 
-				await googleMap.addMarkers([
-					{
-						coordinate: {
-							lat: report.location.latitude,
-							lng: report.location.longitude,
-						},
+				const markerId = await googleMap.addMarker({
+					coordinate: {
+						lat: report.location.latitude,
+						lng: report.location.longitude,
 					},
-				]);
+				});
+
+				markerMap.current.set(report.reporter.id, markerId);
 			}
 		} catch (error) {
 			console.error("Failed to create map:", error);
@@ -105,7 +151,7 @@ function RouteComponent() {
 				<h1 className="font-playfair-display-bold mb-4">Highest Priorities</h1>
 
 				<div className="divide-foreground/10 divide-y overflow-y-scroll">
-					{loaderData.reports.map((report) => {
+					{reports.map((report) => {
 						return (
 							<PriorityItem report={report} map={mapInstance} key={report.id} />
 						);

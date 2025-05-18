@@ -7,7 +7,7 @@ export enum CitizenStatus {
 export type Location = {
 	longitude: number;
 	latitude: number;
-	address: number;
+	address?: string;
 };
 
 export type Reporter = {
@@ -37,3 +37,8 @@ export type Report = {
 	aiGenSituation: string;
 	photoUrls: string[];
 } & BasicReport;
+
+export type SaveLocationRequest = {
+	location: Location;
+	reporterId: string;
+};

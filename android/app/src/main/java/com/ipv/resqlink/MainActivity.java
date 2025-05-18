@@ -1,4 +1,4 @@
-package com.example.app;
+package com.ipv.resqlink;
 
 import com.getcapacitor.BridgeActivity;
 

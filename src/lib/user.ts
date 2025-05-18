@@ -1,3 +1,4 @@
+import { CapacitorHttp } from "@capacitor/core";
 import { ApiResponse } from "./api";
 
 export enum UserRole {
@@ -33,11 +34,13 @@ export type UserSession = {
 export async function getUserSession(
 	token: string,
 ): Promise<ApiResponse<UserSession | null>> {
-	const response = await fetch(
-		`${import.meta.env.VITE_BACKEND_URL}/api/session?token=${token}`,
-	);
+	const response = await CapacitorHttp.get({
+		url: `${import.meta.env.VITE_BACKEND_URL}/api/session?token=${token}`,
+	});
 
-	const result: ApiResponse<UserSession> = await response.json();
+    console.log(response)
+
+	const result: ApiResponse<UserSession> = response.data;
 
 	return result;
 }
