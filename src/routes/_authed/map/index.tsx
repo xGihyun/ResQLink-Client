@@ -13,25 +13,21 @@ import {
 	WebSocketEvent,
 	WebSocketMessage,
 } from "@/lib/websocket";
+import { useReportsStore } from "@/store/store.reports";
 
 export const Route = createFileRoute("/_authed/map/")({
 	component: RouteComponent,
 	loader: async () => {
-		const response = await CapacitorHttp.get({
-			url: `${getApiEndpoint()}/api/reports`,
-		});
-		const result: ApiResponse<BasicReport[]> = response.data;
-		if (response.status !== 200) {
+		const { getReports } = useReportsStore.getState();
+		const result = await getReports();
+		if (result.code !== 200) {
 			throw new Error(result.message);
 		}
-
-		return { reports: result.data };
 	},
 });
 
 function RouteComponent() {
-	const loaderData = Route.useLoaderData();
-	const [reports, setReports] = useState<BasicReport[]>(loaderData.reports);
+	const reportsStore = useReportsStore();
 
 	const mapContainerRef = useRef<HTMLDivElement | null>(null);
 	const mapRef = useRef<GoogleMap | null>(null);
@@ -50,13 +46,7 @@ function RouteComponent() {
 				case WebSocketEvent.SaveLocation:
 					const data = result.data as SaveLocationRequest;
 
-					setReports((prev) =>
-						prev.map((report) =>
-							report.reporter.id === data.reporterId
-								? { ...report, location: data.location }
-								: report,
-						),
-					);
+					reportsStore.saveLocation(data);
 
 					const markerId = markerMap.current.get(data.reporterId);
 					if (!markerId || !mapRef.current) {
@@ -120,7 +110,7 @@ function RouteComponent() {
 				});
 			}
 
-			for (const report of loaderData.reports) {
+			for (const report of unrespondedReports) {
 				if (!report.location) {
 					continue;
 				}
@@ -150,24 +140,29 @@ function RouteComponent() {
 		};
 	}, []);
 
+	const unrespondedReports = useReportsStore(state => state.unrespondedReports);
+
 	return (
-		<div className="flex flex-col h-svh w-full">
+		<div className="flex h-svh w-full flex-col">
 			<div ref={mapContainerRef} className="z-0 h-3/5 w-full" id="map"></div>
 
-			<div className="bg-background p-6 h-2/5">
+			<div className="bg-background h-2/5 p-6">
 				<h1 className="font-playfair-display-bold mb-4">Highest Priorities</h1>
 
 				<div className="divide-foreground/10 divide-y overflow-y-scroll">
-					{reports.map((report) => {
-						return (
-							<PriorityItem report={report} map={mapInstance} key={report.id} />
-						);
-					})}
-					{reports.map((report) => {
-						return (
-							<PriorityItem report={report} map={mapInstance} key={report.id} />
-						);
-					})}
+					{unrespondedReports.length > 0 ? (
+						unrespondedReports.map((report) => {
+							return (
+								<PriorityItem
+									report={report}
+									map={mapInstance}
+									key={report.id}
+								/>
+							);
+						})
+					) : (
+						<p className="text-muted-foreground">No reports found.</p>
+					)}
 				</div>
 			</div>
 		</div>

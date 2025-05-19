@@ -38,8 +38,6 @@ export async function getUserSession(
 		url: `${getApiEndpoint()}/api/session?token=${token}`,
 	});
 
-    console.log(response)
-
 	const result: ApiResponse<UserSession> = response.data;
 
 	return result;

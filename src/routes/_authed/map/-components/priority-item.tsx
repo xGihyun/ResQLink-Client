@@ -2,6 +2,7 @@ import { Badge, badgeVariants } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BasicReport, CitizenStatus } from "@/lib/report";
 import { GoogleMap } from "@capacitor/google-maps";
+import { Link } from "@tanstack/react-router";
 import { VariantProps } from "class-variance-authority";
 import { format } from "date-fns";
 import { MapPinIcon } from "lucide-react";
@@ -65,23 +66,30 @@ export function PriorityItem(props: PriorityItemProps): JSX.Element {
 	}
 
 	return (
-		<button
-			className="flex w-full items-center justify-between gap-2 py-2"
-		>
-			<div className="flex items-center gap-2">
-				<Badge variant={status.variant} className="font-playfair-display-bold">
-					{status.label}
-				</Badge>
-				<p>{props.report.reporter.name}</p>
-			</div>
+		<div className="flex w-full items-center justify-between gap-2 py-2">
+			<Link
+				className="flex w-full items-center justify-between gap-2 py-2"
+				to="/reporters/$reporterId"
+				params={{ reporterId: props.report.reporter.id }}
+			>
+				<div className="flex items-center gap-2">
+					<Badge
+						variant={status.variant}
+						className="font-playfair-display-bold"
+					>
+						{status.label}
+					</Badge>
+					<p>{props.report.reporter.name}</p>
+				</div>
+
+				<div>{format(props.report.createdAt, "hh:mm a")}</div>
+			</Link>
 
 			<div className="flex items-center gap-4">
-				<div>{format(props.report.createdAt, "hh:mm a")}</div>
-
 				<Button size="icon" onClick={handleFocus}>
 					<MapPinIcon />
 				</Button>
 			</div>
-		</button>
+		</div>
 	);
 }

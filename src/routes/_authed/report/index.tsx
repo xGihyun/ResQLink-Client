@@ -177,9 +177,9 @@ function RouteComponent(): JSX.Element {
 		<div className="bg-background h-svh w-full">
 			<div className="mx-auto flex h-full w-full max-w-md min-w-[300px] flex-col items-center justify-start gap-6 p-4">
 				<div className="flex w-full flex-col gap-3">
-					<div className="font-playfair-display-black text-primary text-2xl">
+					<h1 className="font-playfair-display-black text-primary text-2xl">
 						Emergency Status Update
-					</div>
+					</h1>
 					<hr className="border-primary border" />
 				</div>
 

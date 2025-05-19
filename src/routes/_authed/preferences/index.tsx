@@ -118,7 +118,7 @@ function RouteComponent(): JSX.Element {
 					</div>
 				</div>
 
-				<Button onClick={handleSignOut}>Log Out</Button>
+				<Button onClick={handleSignOut} className="font-poppins-bold h-12">Log Out</Button>
 
 				<Navbar />
 			</div>

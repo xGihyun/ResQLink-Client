@@ -16,6 +16,11 @@ export type Reporter = {
 	name: string;
 };
 
+export type InitResponder = {
+    name: string;
+	userId?: string;
+};
+
 export type Responder = {
 	id: string;
 	createdAt: string;
@@ -38,7 +43,35 @@ export type Report = {
 	photoUrls: string[];
 } & BasicReport;
 
+export type UserReport = {
+	id: string;
+	createdAt: string;
+	updatedAt: string;
+	status: CitizenStatus;
+	responder?: Responder;
+	location?: Location;
+	rawSituation: string;
+	aiGenSituation: string;
+	photoUrls: string[];
+};
+
 export type SaveLocationRequest = {
 	location: Location;
 	reporterId: string;
+};
+
+export type ReportsByReporter = {
+	reports: UserReport[];
+	reporter: Reporter;
+	location?: Location;
+};
+
+export type SetResponderRequest = {
+	reporterId: string;
+	responder: InitResponder;
+};
+
+export type SetResponderResponse = {
+	reporterId: string;
+	responder: Responder;
 };
