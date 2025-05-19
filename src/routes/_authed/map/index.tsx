@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { GoogleMap } from "@capacitor/google-maps";
 import { Geolocation } from "@capacitor/geolocation";
 import { Capacitor, CapacitorHttp } from "@capacitor/core";
-import { ApiResponse } from "@/lib/api";
+import { ApiResponse, getApiEndpoint } from "@/lib/api";
 import { BasicReport, SaveLocationRequest } from "@/lib/report";
 import { PriorityItem } from "./-components/priority-item";
 import useWebSocket from "react-use-websocket";
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_authed/map/")({
 	component: RouteComponent,
 	loader: async () => {
 		const response = await CapacitorHttp.get({
-			url: `${import.meta.env.VITE_BACKEND_URL}/api/reports`,
+			url: `${getApiEndpoint()}/api/reports`,
 		});
 		const result: ApiResponse<BasicReport[]> = response.data;
 		if (response.status !== 200) {
@@ -151,13 +151,18 @@ function RouteComponent() {
 	}, []);
 
 	return (
-		<div className="h-full w-full">
+		<div className="flex flex-col h-svh w-full">
 			<div ref={mapContainerRef} className="z-0 h-3/5 w-full" id="map"></div>
 
-			<div className="bg-background p-6">
+			<div className="bg-background p-6 h-2/5">
 				<h1 className="font-playfair-display-bold mb-4">Highest Priorities</h1>
 
 				<div className="divide-foreground/10 divide-y overflow-y-scroll">
+					{reports.map((report) => {
+						return (
+							<PriorityItem report={report} map={mapInstance} key={report.id} />
+						);
+					})}
 					{reports.map((report) => {
 						return (
 							<PriorityItem report={report} map={mapInstance} key={report.id} />

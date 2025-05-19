@@ -52,7 +52,7 @@ export function Navbar(): JSX.Element {
 					</svg>
 				</Link>
 
-				<Link to="/preferences" className={`${location.href === '/main/preferences' ? 'text-primary' : 'text-foreground'}`}>
+				<Link to="/preferences" className={`${location.href === '/preferences' ? 'text-primary' : 'text-foreground'}`}>
 					<svg
 						width="25"
 						height="24"

@@ -1,5 +1,5 @@
 import { CapacitorHttp } from "@capacitor/core";
-import { ApiResponse } from "./api";
+import { ApiResponse, getApiEndpoint } from "./api";
 
 export enum UserRole {
 	Citizen = "citizen",
@@ -35,7 +35,7 @@ export async function getUserSession(
 	token: string,
 ): Promise<ApiResponse<UserSession | null>> {
 	const response = await CapacitorHttp.get({
-		url: `${import.meta.env.VITE_BACKEND_URL}/api/session?token=${token}`,
+		url: `${getApiEndpoint()}/api/session?token=${token}`,
 	});
 
     console.log(response)

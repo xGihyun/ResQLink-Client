@@ -1,8 +1,10 @@
 import { Badge, badgeVariants } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { BasicReport, CitizenStatus } from "@/lib/report";
 import { GoogleMap } from "@capacitor/google-maps";
 import { VariantProps } from "class-variance-authority";
 import { format } from "date-fns";
+import { MapPinIcon } from "lucide-react";
 import { JSX } from "react";
 
 type PriorityItemProps = {
@@ -65,7 +67,6 @@ export function PriorityItem(props: PriorityItemProps): JSX.Element {
 	return (
 		<button
 			className="flex w-full items-center justify-between gap-2 py-2"
-			onClick={handleFocus}
 		>
 			<div className="flex items-center gap-2">
 				<Badge variant={status.variant} className="font-playfair-display-bold">
@@ -74,7 +75,13 @@ export function PriorityItem(props: PriorityItemProps): JSX.Element {
 				<p>{props.report.reporter.name}</p>
 			</div>
 
-			<div>{format(props.report.createdAt, "hh:mm a")}</div>
+			<div className="flex items-center gap-4">
+				<div>{format(props.report.createdAt, "hh:mm a")}</div>
+
+				<Button size="icon" onClick={handleFocus}>
+					<MapPinIcon />
+				</Button>
+			</div>
 		</button>
 	);
 }

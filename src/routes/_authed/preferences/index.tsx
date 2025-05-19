@@ -29,7 +29,7 @@ function RouteComponent(): JSX.Element {
 		<div className="bg-background h-svh w-full max-w-3xl">
 			<div className="mx-auto flex h-full w-full flex-col gap-6 p-4">
 				<div className="inline-flex h-11 flex-col items-start justify-start gap-3">
-					<div className="font-playfair-display self-stretch text-2xl font-black text-[#5bbea9]">
+					<div className="font-playfair-display-black self-stretch text-2xl text-[#5bbea9]">
 						User Preferences
 					</div>
 					<div className="h-[0px] self-stretch border border-[#5bbea9]"></div>

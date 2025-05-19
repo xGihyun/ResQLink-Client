@@ -20,7 +20,7 @@ import { StatusItem } from "./-components/status-item";
 import { Label } from "@/components/ui/label";
 import { cn, fileToBase64, formatName } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { ApiResponse } from "@/lib/api";
+import { ApiResponse, getApiEndpoint } from "@/lib/api";
 import { toast } from "sonner";
 import { CitizenStatus } from "@/lib/report";
 import { CapacitorHttp } from "@capacitor/core";
@@ -95,9 +95,8 @@ function RouteComponent(): JSX.Element {
 		console.log(formData);
 
 		const response = await CapacitorHttp.post({
-			url: `${import.meta.env.VITE_BACKEND_URL}/api/reports`,
+			url: `${getApiEndpoint()}/api/reports`,
 			data: formData,
-			dataType: "formData",
 		});
 		const result: ApiResponse = response.data;
 		if (response.status !== 201) {
@@ -124,6 +123,7 @@ function RouteComponent(): JSX.Element {
 				return;
 			}
 
+            // TODO: Test this part
 			const response = await CapacitorHttp.get({ url: photo.webPath });
 			const binaryData = atob(response.data);
 			const bytes = new Uint8Array(binaryData.length);
@@ -174,7 +174,7 @@ function RouteComponent(): JSX.Element {
 	}
 
 	return (
-		<div className="bg-background h-svh w-full max-w-3xl">
+		<div className="bg-background h-svh w-full">
 			<div className="mx-auto flex h-full w-full max-w-md min-w-[300px] flex-col items-center justify-start gap-6 p-4">
 				<div className="flex w-full flex-col gap-3">
 					<div className="font-playfair-display-black text-primary text-2xl">

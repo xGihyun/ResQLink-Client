@@ -1,7 +1,7 @@
 import { createContext, JSX, ReactNode, useContext, useState } from "react";
 import { UserSession, getUserSession, User } from "./lib/user";
 import { deleteCookie, getCookie, setCookie } from "./lib/cookie";
-import { ApiResponse } from "./lib/api";
+import { ApiResponse, getApiEndpoint } from "./lib/api";
 import { SignInRequest, SignInResponse } from "./routes/_auth/sign-in/-types";
 import { SignInAnonymousSchema } from "./routes/_auth/sign-in/anonymous/-schema";
 import {
@@ -53,7 +53,7 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 		}
 
 		await CapacitorHttp.post({
-			url: `${import.meta.env.VITE_BACKEND_URL}/api/sign-out`,
+			url: `${getApiEndpoint()}/api/sign-out`,
 			data: {
 				token,
 				userId: user.id,
@@ -71,7 +71,7 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 		value: SignInRequest,
 	): Promise<ApiResponse<SignInResponse>> {
 		const response = await CapacitorHttp.post({
-			url: `${import.meta.env.VITE_BACKEND_URL}/api/sign-in`,
+			url: `${getApiEndpoint()}/api/sign-in`,
 			data: value,
 			headers: {
 				"Content-Type": "application/json",
@@ -93,7 +93,7 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 		};
 
 		const response = await CapacitorHttp.post({
-			url: `${import.meta.env.VITE_BACKEND_URL}/api/sign-in/anonymous`,
+			url: `${getApiEndpoint()}/api/sign-in/anonymous`,
 			data: request,
 			headers: {
 				"Content-Type": "application/json",

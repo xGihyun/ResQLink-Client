@@ -1,3 +1,4 @@
+import { Capacitor } from "@capacitor/core";
 import { Options } from "react-use-websocket";
 
 export enum WebSocketEvent {
@@ -39,4 +40,12 @@ export const WEBSOCKET_OPTIONS: Options = {
 	reconnectAttempts: 10,
 };
 
-export const WEBSOCKET_URL = `ws://10.0.2.2:3002/ws`;
+function getWebSocketUrl(): string {
+	if (Capacitor.getPlatform() === "android") {
+		return `ws://10.0.2.2:3002/ws`;
+	}
+
+	return `ws://localhost:3002/ws`;
+}
+
+export const WEBSOCKET_URL = getWebSocketUrl();

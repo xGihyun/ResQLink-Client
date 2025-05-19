@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button";
 
 import { signUpSchema, SignUpSchema } from "./-schema";
 import { toast } from "sonner";
-import { ApiResponse } from "@/lib/api";
+import { ApiResponse, getApiEndpoint } from "@/lib/api";
 
 import { parseDate, fromDate } from "@internationalized/date";
 import { UserRole } from "@/lib/user";
@@ -66,7 +66,7 @@ function RouteComponent() {
 		console.log(value);
 
 		const response = await CapacitorHttp.post({
-			url: `${import.meta.env.VITE_BACKEND_URL}/api/sign-up`,
+			url: `${getApiEndpoint()}/api/sign-up`,
 			data: value,
 			headers: {
 				"Content-Type": "application/json",
