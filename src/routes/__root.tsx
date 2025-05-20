@@ -7,7 +7,7 @@ import { AuthContextValue } from "@/auth";
 
 type RouterContext = {
 	auth: AuthContextValue;
-	queryClient: QueryClient;
+	queryClient: QueryClient; // NOTE: Not used
 };
 
 export const Route = createRootRouteWithContext<RouterContext>()({

@@ -17,7 +17,7 @@ export type Reporter = {
 };
 
 export type InitResponder = {
-    name: string;
+	name: string;
 	userId?: string;
 };
 
@@ -74,4 +74,12 @@ export type SetResponderRequest = {
 export type SetResponderResponse = {
 	reporterId: string;
 	responder: Responder;
+};
+
+export type CreateReportRequest = {
+	userId?: string;
+	name: string;
+	status: CitizenStatus;
+	rawSituation: string;
+	photoUrls: string[];
 };

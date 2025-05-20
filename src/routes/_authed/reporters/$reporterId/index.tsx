@@ -18,6 +18,7 @@ import {
 import { formatName } from "@/lib/utils";
 import { toast } from "sonner";
 import { useReportsStore } from "@/store/store.reports";
+import { useUserStore } from "@/store/store.user";
 
 export const Route = createFileRoute("/_authed/reporters/$reporterId/")({
 	component: RouteComponent,
@@ -36,14 +37,15 @@ export const Route = createFileRoute("/_authed/reporters/$reporterId/")({
 	},
 });
 
+// NOTE: Horrible code, but whatever
 const badgeColors: Record<string, string> = {
-	danger: "bg-[#E57373] text-white",
+	in_danger: "bg-[#E57373] text-white",
 	at_risk: "bg-[#FFB74D] text-white",
 	safe: "bg-[#81C784] text-white",
 };
 
 const STATUS_OPTIONS = {
-	safe: "safe",
+	safe: "Safe",
 	at_risk: "At Risk",
 	in_danger: "In Danger",
 };
@@ -52,6 +54,7 @@ function RouteComponent(): JSX.Element {
 	const loaderData = Route.useLoaderData();
 	const routeContext = Route.useRouteContext();
 	const reportsStore = useReportsStore();
+	const currentUser = useUserStore().user;
 
 	const initials = loaderData.userReport.reporter.name
 		.split(" ")
@@ -59,18 +62,26 @@ function RouteComponent(): JSX.Element {
 		.join("")
 		.toUpperCase();
 
+	// FIXME: using `routeContext` doesn't work since the data is undefined for some reason
+	// when running on Android.
+
 	async function setResponder(): Promise<void> {
 		const toastId = toast.loading("Marking as responded...");
+
+		if (!currentUser) {
+			toast.error("Current user not found.", { id: toastId });
+			return;
+		}
 
 		const request: SetResponderRequest = {
 			reporterId: loaderData.userReport.reporter.id,
 			responder: {
 				name: formatName({
-					firstName: routeContext.user.firstName,
-					middleName: routeContext.user.middleName,
-					lastName: routeContext.user.lastName,
+					firstName: currentUser.firstName,
+					middleName: currentUser.middleName,
+					lastName: currentUser.lastName,
 				}),
-				userId: routeContext.user.id,
+				userId: currentUser.id,
 			},
 		};
 
@@ -111,7 +122,8 @@ function RouteComponent(): JSX.Element {
 							</h2>
 
 							<p className="text-muted-foreground font-poppins text-sm">
-								Last update
+								Last Update at{" "}
+								{format(loaderData.userReport.reports[0].createdAt, "hh:mm a")}
 							</p>
 						</div>
 					</div>
@@ -119,10 +131,10 @@ function RouteComponent(): JSX.Element {
 					{/* <Badge>{priority} Priority</Badge> */}
 				</div>
 
-				<div className="bg-primary flex w-full items-center gap-2 rounded-lg px-4 py-2 text-white">
-					<img className="text-lg" src={LocationIcon} />
-					<span className="text-sm font-medium">Location: </span>
-				</div>
+				{/* <div className="bg-primary flex w-full items-center gap-2 rounded-lg px-4 py-2 text-white"> */}
+				{/* 	<img className="text-lg" src={LocationIcon} /> */}
+				{/* 	<span className="text-sm font-medium">Location: </span> */}
+				{/* </div> */}
 
 				{/* <div className="text-left w-full"> */}
 				{/* 	<h2 className="font-playfair-display mt-4 inline-flex items-center text-xl font-bold"> */}

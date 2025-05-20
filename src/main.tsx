@@ -15,6 +15,7 @@ const router = createRouter({
 		auth: undefined!, // Will be set from the component
 		queryClient,
 	},
+    defaultPreloadStaleTime: 0, // NOTE: Brute force solution to keep `/map` loaderData updated
 });
 
 // Register things for typesafety

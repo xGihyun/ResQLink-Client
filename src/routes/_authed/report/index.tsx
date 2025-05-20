@@ -22,7 +22,7 @@ import { cn, fileToBase64, formatName } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ApiResponse, getApiEndpoint } from "@/lib/api";
 import { toast } from "sonner";
-import { CitizenStatus } from "@/lib/report";
+import { CitizenStatus, CreateReportRequest } from "@/lib/report";
 import { CapacitorHttp } from "@capacitor/core";
 
 export const Route = createFileRoute("/_authed/report/")({
@@ -81,22 +81,34 @@ function RouteComponent(): JSX.Element {
 		},
 	});
 
+	// FIXME: `CapacitorHttp` doesn't work well with submitting form data.
+	// Use JSON for now, but it won't be able to submit images
 	async function onSubmit(value: ReportSchema): Promise<void> {
-		const formData = new FormData();
-		formData.append("userId", routeContext.user.id);
-		formData.append("name", value.name);
-		formData.append("status", value.status);
-		formData.append("rawSituation", value.rawSituation);
+		// const formData = new FormData();
+		// formData.append("userId", routeContext.user.id);
+		// formData.append("name", value.name);
+		// formData.append("status", value.status);
+		// formData.append("rawSituation", value.rawSituation);
+		//
+		// value.photos.forEach((photo) => {
+		// 	formData.append("photos", photo);
+		// });
+		//
+		// console.log(formData);
 
-		value.photos.forEach((photo) => {
-			formData.append("photos", photo);
-		});
-
-		console.log(formData);
-
+		const request: CreateReportRequest = {
+			userId: routeContext.user.id,
+			name: value.name,
+			status: value.status,
+			rawSituation: value.rawSituation,
+			photoUrls: [],
+		};
 		const response = await CapacitorHttp.post({
 			url: `${getApiEndpoint()}/api/reports`,
-			data: formData,
+			data: request,
+			headers: {
+				"Content-Type": "application/json",
+			},
 		});
 		const result: ApiResponse = response.data;
 		if (response.status !== 201) {
@@ -123,7 +135,7 @@ function RouteComponent(): JSX.Element {
 				return;
 			}
 
-            // TODO: Test this part
+			// TODO: Test this part
 			const response = await CapacitorHttp.get({ url: photo.webPath });
 			const binaryData = atob(response.data);
 			const bytes = new Uint8Array(binaryData.length);
@@ -189,7 +201,6 @@ function RouteComponent(): JSX.Element {
 							console.error(errors),
 						)}
 						className="w-full space-y-4"
-						encType="multipart/form-data"
 					>
 						<FormField
 							control={form.control}
