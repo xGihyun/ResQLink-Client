@@ -160,6 +160,7 @@ function RouteComponent(): JSX.Element {
 		}
 	}
 
+	// ERROR: `FilePicker.getImages()` not implemented for android
 	async function handleUploadImage(): Promise<void> {
 		try {
 			const result = await FilePicker.pickImages();
@@ -186,7 +187,7 @@ function RouteComponent(): JSX.Element {
 	}
 
 	return (
-		<div className="bg-background h-svh w-full">
+		<div className="bg-background h-full w-full">
 			<div className="mx-auto flex h-full w-full max-w-md min-w-[300px] flex-col items-center justify-start gap-6 p-4">
 				<div className="flex w-full flex-col gap-3">
 					<h1 className="font-playfair-display-black text-primary text-2xl">
@@ -273,35 +274,35 @@ function RouteComponent(): JSX.Element {
 							)}
 						/>
 
-						<div className="flex w-full flex-col gap-3">
-							<div className="font-playfair-display-semibold text-base">
-								Add Photo Evidence
-							</div>
-							<div className="flex w-full flex-col gap-2">
-								<Button type="button" onClick={handleTakePhoto} size="lg">
-									Take Photo
-								</Button>
-								<Button
-									type="button"
-									onClick={handleUploadImage}
-									size="lg"
-									variant="secondary"
-								>
-									Upload Image
-								</Button>
-							</div>
-
-							<FormField
-								control={form.control}
-								name="photos"
-								render={() => (
-									<FormItem>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
-
+						{/* <div className="flex w-full flex-col gap-3"> */}
+						{/* 	<div className="font-playfair-display-semibold text-base"> */}
+						{/* 		Add Photo Evidence */}
+						{/* 	</div> */}
+						{/* 	<div className="flex w-full flex-col gap-2"> */}
+						{/* 		<Button type="button" onClick={handleTakePhoto} size="lg"> */}
+						{/* 			Take Photo */}
+						{/* 		</Button> */}
+						{/* 		<Button */}
+						{/* 			type="button" */}
+						{/* 			onClick={handleUploadImage} */}
+						{/* 			size="lg" */}
+						{/* 			variant="secondary" */}
+						{/* 		> */}
+						{/* 			Upload Image */}
+						{/* 		</Button> */}
+						{/* 	</div> */}
+						{/**/}
+						{/* 	<FormField */}
+						{/* 		control={form.control} */}
+						{/* 		name="photos" */}
+						{/* 		render={() => ( */}
+						{/* 			<FormItem> */}
+						{/* 				<FormMessage /> */}
+						{/* 			</FormItem> */}
+						{/* 		)} */}
+						{/* 	/> */}
+						{/* </div> */}
+						{/**/}
 						<Button
 							type="submit"
 							size="lg"

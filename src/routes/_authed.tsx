@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_authed")({
 
 function RouteComponent(): JSX.Element {
 	return (
-		<div className="h-svh content-center">
+		<div className="h-svh content-center pb-20">
 			{/* <LocationTracker reporterId="a39592d0-29b8-4bd3-9b9b-99bf6df13e50" /> */}
 			<Navbar />
 			<Outlet />
