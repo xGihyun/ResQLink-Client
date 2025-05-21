@@ -8,8 +8,8 @@ export type ApiResponse<T = unknown> = {
 
 export function getApiEndpoint(): string {
 	if (Capacitor.getPlatform() === "android") {
-		return `http://10.0.2.2:3002`;
+		return `http://192.168.254.106:3002`;
 	}
 
-	return `http://localhost:3002`;
+	return `http://192.168.254.106:3002`;
 }

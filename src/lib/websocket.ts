@@ -42,10 +42,10 @@ export const WEBSOCKET_OPTIONS: Options = {
 
 function getWebSocketUrl(): string {
 	if (Capacitor.getPlatform() === "android") {
-		return `ws://10.0.2.2:3002/ws`;
+		return `ws://192.168.254.106:3002/ws`;
 	}
 
-	return `ws://localhost:3002/ws`;
+	return `ws://192.168.254.106:3002/ws`;
 }
 
 export const WEBSOCKET_URL = getWebSocketUrl();
